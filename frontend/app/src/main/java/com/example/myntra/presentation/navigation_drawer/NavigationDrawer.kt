@@ -7,10 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,14 +50,16 @@ fun DrawerHeader(
             Text(text = userName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
-                color = Color.White
+                color = Color.White,
+                fontFamily = MaterialTheme.typography.subtitle1.fontFamily
             )
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Log In",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = Color.White
+                    color = Color.White,
+                    fontFamily = MaterialTheme.typography.subtitle1.fontFamily
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -68,7 +67,8 @@ fun DrawerHeader(
                 Text(text = "Sign Up",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = Color.White
+                    color = Color.White,
+                    fontFamily = MaterialTheme.typography.subtitle1.fontFamily
                 )
             }
         }
@@ -105,7 +105,10 @@ fun DrawerBody(
 
                 Text(text = item.title,
                     modifier = Modifier.weight(1f),
-                    style = itemTextStyle)
+                    style = itemTextStyle,
+                    fontSize = MaterialTheme.typography.subtitle1.fontSize,
+                    fontFamily = MaterialTheme.typography.subtitle1.fontFamily
+                    )
             }
 
             Divider()

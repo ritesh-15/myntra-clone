@@ -21,10 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.myntra.AppBottomNavigation
 import com.example.myntra.R
 import com.example.myntra.presentation.navigation_drawer.DrawerBody
 import com.example.myntra.presentation.navigation_drawer.DrawerHeader
 import com.example.myntra.presentation.navigation_drawer.NavDrawerItem
+import com.example.myntra.ui.theme.Poppins
 import com.example.myntra.ui.theme.dotLight
 import com.example.myntra.ui.theme.light
 import com.example.myntra.ui.theme.primary
@@ -35,7 +39,7 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
@@ -64,7 +68,9 @@ fun HomeScreen() {
         },
         scaffoldState = scaffoldState,
         drawerShape = RectangleShape,
+        bottomBar = { AppBottomNavigation(navController = navController) }
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,7 +105,9 @@ fun HomeScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
         }
+
     }
+
 
 }
 
@@ -114,8 +122,8 @@ fun Featured() {
         Text(
             text = "Deal Of The Day",
             fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            fontFamily = FontFamily.SansSerif
+            fontSize = MaterialTheme.typography.h6.fontSize,
+            fontFamily = MaterialTheme.typography.h6.fontFamily
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -156,8 +164,8 @@ fun TopPicks() {
         Text(
             text = "Top Picks",
             fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            fontFamily = FontFamily.SansSerif
+            fontSize = MaterialTheme.typography.h6.fontSize,
+            fontFamily = MaterialTheme.typography.h6.fontFamily
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -351,5 +359,5 @@ fun HomeScreenTopBar(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    HomeScreen(rememberNavController())
 }

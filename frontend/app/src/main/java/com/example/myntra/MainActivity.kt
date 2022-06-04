@@ -10,15 +10,21 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.myntra.presentation.home_screen.HomeScreen
 import com.example.myntra.ui.theme.MyntraTheme
 
 class MainActivity : ComponentActivity() {
+    
+    private lateinit var navHostController: NavHostController
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyntraTheme {
-                HomeScreen()
+                navHostController = rememberNavController()
+                Navigation(navController = navHostController)
             }
         }
     }
