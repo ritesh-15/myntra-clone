@@ -1,4 +1,4 @@
-package com.example.myntra
+package com.example.myntra.common.bottom_navigation
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width

@@ -1,5 +1,6 @@
 package com.example.myntra.presentation.home_screen
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,19 +17,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.myntra.AppBottomNavigation
+import com.example.myntra.common.bottom_navigation.AppBottomNavigation
 import com.example.myntra.R
-import com.example.myntra.presentation.navigation_drawer.DrawerBody
-import com.example.myntra.presentation.navigation_drawer.DrawerHeader
-import com.example.myntra.presentation.navigation_drawer.NavDrawerItem
-import com.example.myntra.ui.theme.Poppins
+import com.example.myntra.common.nav_drawer.DrawerBody
+import com.example.myntra.common.nav_drawer.DrawerHeader
+import com.example.myntra.common.nav_drawer.NavDrawerItem
 import com.example.myntra.ui.theme.dotLight
 import com.example.myntra.ui.theme.light
 import com.example.myntra.ui.theme.primary
@@ -39,7 +37,7 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavHostController) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
@@ -53,7 +51,7 @@ fun HomeScreen(navController: NavController) {
             })
         },
         drawerContent = {
-            DrawerHeader()
+            DrawerHeader(navController = navController)
             DrawerBody(items = listOf(
                 NavDrawerItem(id = "categories",
                     icon = painterResource(id = R.drawable.ic_catogiries_outlined),
@@ -62,10 +60,11 @@ fun HomeScreen(navController: NavController) {
                 NavDrawerItem(id = "orders",
                     icon = painterResource(id = R.drawable.ic_orders),
                     title = "Orders"
-                )
-            ),
+                ),
+            ), navController = navController,
                 onClick = {})
         },
+
         scaffoldState = scaffoldState,
         drawerShape = RectangleShape,
         bottomBar = { AppBottomNavigation(navController = navController) }
@@ -355,6 +354,7 @@ fun HomeScreenTopBar(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
