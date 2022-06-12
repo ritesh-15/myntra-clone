@@ -1,0 +1,40 @@
+{
+  "dependencies": {
+    "@prisma/client": "^3.15.1",
+    "@sendgrid/mail": "^7.7.0",
+    "bcrypt": "^5.0.1",
+    "cloudinary": "^1.30.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "helmet": "^5.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.0"
+  },
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon -L src/server.ts",
+    "start": "node src/server.js",
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/morgan": "^1.9.3",
+    "@types/node": "^17.0.38",
+    "@types/passport-jwt": "^3.0.6",
+    "nodemon": "^2.0.16",
+    "prisma": "^3.15.1",
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.3"
+  }
+}

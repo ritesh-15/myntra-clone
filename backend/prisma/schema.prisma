@@ -1,0 +1,80 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  shadowDatabaseUrl    = env("SHADOW_DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model User {
+  id               String    @id @unique @default(cuid())
+  name             String?   @default("") @db.VarChar(255)
+  email            String    @unique
+  password         String?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  phoneNumber      String?
+  isAdmin          Boolean   @default(false)
+  isVerified       Boolean   @default(false)
+  isActive         Boolean   @default(false)
+  Token            Token[]
+}
+
+model Token {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  description   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  originalPrice Int
+  discountPrice Int      @default(0)
+  discount      Int      @default(0)
+  catagory      Catagory @relation(fields: [catagoryId], references: [id])
+  catagoryId    String
+  fabric        String
+  stock         Int      @default(1)
+  Image         Image[]
+  Size          Size[]
+  fit           String
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String   @unique
+  publicId  String   @unique
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Catagory {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Product   Product[]
+}
+
+model Size {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+}
