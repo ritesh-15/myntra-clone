@@ -10,14 +10,16 @@ class CludinaryHelper {
     return `https://res.cloudinary.com/dvx1jvxzk/image/upload/v1599140078/images/${imageName}`;
   }
 
-  public static async uploadImage(image: any) {
+  public static async uploadImage(image: string) {
     cloudinary.config({
       cloud_name: CLOUDINARY_CLOUD_NAME,
       api_key: CLOUDINARY_API_KEY,
       api_secret: CLOUDINARY_API_SECRET,
     });
 
-    const result = await cloudinary.uploader.upload(image);
+    const result = await cloudinary.uploader.upload(image, {
+      folder: "myntra",
+    });
     return result;
   }
 }

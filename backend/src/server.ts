@@ -8,6 +8,8 @@ import morgan from "morgan";
 import passport from "passport";
 import { passportJwt } from "./middlewares/passport-jwt";
 import cookieParser from "cookie-parser";
+import { productRouter } from "./routes/products_routes";
+import multer from "multer";
 
 const app: Application = express();
 
@@ -24,6 +26,7 @@ passportJwt(passport);
 
 // routes
 app.use("/api/v1", authRouter);
+app.use("/api/v1", productRouter);
 
 // error handler
 app.use((req: Request, res: Response, next: NextFunction) => {

@@ -36,7 +36,7 @@ model Token {
 
 model Product {
   id            String   @id @default(cuid())
-  name          String   @unique
+  name          String
   description   String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -47,17 +47,17 @@ model Product {
   catagoryId    String
   fabric        String
   stock         Int      @default(1)
-  Image         Image[]
-  Size          Size[]
+  images        Image[]
+  sizes         Size[]
   fit           String
 }
 
 model Image {
-  id        String   @id @default(cuid())
-  url       String   @unique
-  publicId  String   @unique
+  id        String   @id @unique @default(cuid())
+  url       String
+  publicId  String
   product   Product  @relation(fields: [productId], references: [id])
-  productId String   @unique
+  productId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -71,10 +71,12 @@ model Catagory {
 }
 
 model Size {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Product   Product? @relation(fields: [productId], references: [id])
-  productId String?
+  id          String   @id @default(cuid())
+  title       String
+  measurement String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Product     Product? @relation(fields: [productId], references: [id])
+  productId   String
 }
