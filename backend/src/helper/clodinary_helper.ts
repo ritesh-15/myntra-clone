@@ -22,6 +22,17 @@ class CludinaryHelper {
     });
     return result;
   }
+
+  public static async deleteImage(publicId: string) {
+    cloudinary.config({
+      cloud_name: CLOUDINARY_CLOUD_NAME,
+      api_key: CLOUDINARY_API_KEY,
+      api_secret: CLOUDINARY_API_SECRET,
+    });
+
+    const result = await cloudinary.uploader.destroy(publicId);
+    return result;
+  }
 }
 
 export default CludinaryHelper;

@@ -1,6 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
+
 }
 
 datasource db {
@@ -55,8 +56,8 @@ model Product {
 model Image {
   id        String   @id @unique @default(cuid())
   url       String
-  publicId  String
-  product   Product  @relation(fields: [productId], references: [id])
+  publicId  String   @unique
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -77,6 +78,6 @@ model Size {
   description String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Product     Product? @relation(fields: [productId], references: [id])
+  Product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId   String
 }

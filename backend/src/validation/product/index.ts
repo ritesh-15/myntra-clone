@@ -15,3 +15,19 @@ export const productSchema = Joi.object().keys({
     })
   ),
 });
+
+export const updateProductSchema = Joi.object().keys({
+  name: Joi.string(),
+  description: Joi.string(),
+  fit: Joi.string(),
+  fabric: Joi.string(),
+  discount: Joi.number(),
+  originalPrice: Joi.number(),
+  stock: Joi.number(),
+});
+
+export const updateSizeSchema = Joi.object().keys({
+  title: Joi.string(),
+  measurement: Joi.string(),
+  description: Joi.string(),
+});

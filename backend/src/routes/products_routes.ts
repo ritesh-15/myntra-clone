@@ -12,4 +12,30 @@ router
 
 router.route("/product/all").get(productController.getAllProducts);
 
+router
+  .route("/product/:id")
+  .get(productController.getSingleProduct)
+  .put([authenticate, isAdmin], productController.updateProduct)
+  .delete([authenticate, isAdmin], productController.deleteProduct);
+
+router.route("/product/category/all").get(productController.getAllCategories);
+
+router
+  .route("/product/category/:id")
+  .put([authenticate, isAdmin], productController.updateCategory)
+  .get(productController.getSingleCategory);
+
+router
+  .route("/product/size/:id")
+  .put([authenticate, isAdmin], productController.updateSize)
+  .delete([authenticate, isAdmin], productController.deleteSize);
+
+router
+  .route("/product/images/delete")
+  .delete([authenticate, isAdmin], productController.deleteProductImage);
+
+router
+  .route("/product/images/:productId")
+  .put([authenticate, isAdmin, upload], productController.updateProductImage);
+
 export { router as productRouter };
