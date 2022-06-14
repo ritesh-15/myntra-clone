@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import HttpError from "../helper/error_handler";
-import { ProductInterface } from "../interfaces/ProductInterface";
 import { UserInterface } from "../interfaces/UserInterface";
 import PrismaClientProvider from "../providers/provide_prism_client";
 import { createOrderSchema } from "../validation/order";
