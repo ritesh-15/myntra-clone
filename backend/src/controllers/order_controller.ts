@@ -23,6 +23,10 @@ interface Product {
   sizeId: string;
 }
 
+interface UpdateOrder {
+  orderStatus: string;
+}
+
 class OrderController {
   // @route GET /api/order/create
   // @desc Create order
@@ -89,7 +93,7 @@ class OrderController {
       );
 
       // send response
-      res.status(201).json({
+      return res.status(201).json({
         message: "Order created successfully",
         ok: true,
       });
@@ -123,6 +127,136 @@ class OrderController {
         message: "Orders fetched successfully",
         ok: true,
         orders,
+      });
+    } catch (error) {
+      return next(HttpError.internalServerError("Internal server error"));
+    }
+  }
+
+  // @route DELETE /api/order/:id
+  // @desc Delete order
+  // @access Private
+
+  public async deleteOrder(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    const user = req.user as UserInterface;
+
+    if (!id) return next(HttpError.notFound("Id not found"));
+
+    try {
+      const foundOrder = await PrismaClientProvider.get().order.findFirst({
+        where: {
+          AND: [{ id }, { userId: user.id }],
+        },
+      });
+
+      if (!foundOrder) return next(HttpError.notFound("Order not found"));
+
+      const order = await PrismaClientProvider.get().order.delete({
+        where: {
+          id,
+        },
+      });
+
+      return res.status(200).json({
+        message: "Order deleted successfully",
+        ok: true,
+        order,
+      });
+    } catch (error) {
+      return next(HttpError.internalServerError("Internal server error"));
+    }
+  }
+
+  // @route PUT /api/order/:id
+  // @desc Update order
+  // @access Private Admin
+
+  public async updateOrder(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    const user = req.user as UserInterface;
+    const { orderStatus } = req.body;
+
+    if (!id) return next(HttpError.notFound("Id not found"));
+
+    if (!orderStatus) return next(HttpError.notFound("Order status not found"));
+
+    try {
+      const foundOrder = await PrismaClientProvider.get().order.findFirst({
+        where: {
+          AND: [{ id }, { userId: user.id }],
+        },
+      });
+
+      if (!foundOrder) return next(HttpError.notFound("Order not found"));
+
+      const order = await PrismaClientProvider.get().order.update({
+        where: {
+          id,
+        },
+        include: {
+          extra: true,
+          payment: true,
+          address: true,
+          products: {
+            include: {
+              product: true,
+              size: true,
+            },
+          },
+        },
+        data: {
+          extra: {
+            update: {
+              orderStatus,
+            },
+          },
+        },
+      });
+
+      return res.status(200).json({
+        message: "Order updated successfully",
+        ok: true,
+        order,
+      });
+    } catch (error) {
+      return next(HttpError.internalServerError("Internal server error"));
+    }
+  }
+
+  // @route GET /api/order/:id
+  // @desc Get order
+  // @access Private
+
+  public async getOrderById(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+
+    if (!id) return next(HttpError.notFound("Id not found"));
+
+    try {
+      const foundOrder = await PrismaClientProvider.get().order.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          extra: true,
+          payment: true,
+          address: true,
+          products: {
+            include: {
+              product: true,
+              size: true,
+            },
+          },
+        },
+      });
+
+      if (!foundOrder) return next(HttpError.notFound("Order not found"));
+
+      return res.status(200).json({
+        message: "Order fetched successfully",
+        ok: true,
+        order: foundOrder,
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal server error"));

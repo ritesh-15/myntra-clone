@@ -11,4 +11,10 @@ router
   .route("/order/all")
   .get([authenticate, isAdmin], orderController.getAllOrders);
 
+router
+  .route("/order/:id")
+  .get(authenticate, orderController.getOrderById)
+  .put([authenticate, isAdmin], orderController.updateOrder)
+  .delete(authenticate, orderController.deleteOrder);
+
 export { router as orderRouter };
