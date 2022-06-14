@@ -24,33 +24,27 @@ model User {
   isAdmin          Boolean   @default(false)
   isVerified       Boolean   @default(false)
   isActive         Boolean   @default(false)
-  Token            Token[]
-}
-
-model Token {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  createdAt DateTime @default(now())
+  orders           Order[]
+  addresses        Address[]
 }
 
 model Product {
-  id            String   @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String
   description   String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   originalPrice Int
-  discountPrice Int      @default(0)
-  discount      Int      @default(0)
-  catagory      Catagory @relation(fields: [catagoryId], references: [id])
+  discountPrice Int            @default(0)
+  discount      Int            @default(0)
+  catagory      Catagory       @relation(fields: [catagoryId], references: [id])
   catagoryId    String
   fabric        String
-  stock         Int      @default(1)
+  stock         Int            @default(1)
   images        Image[]
   sizes         Size[]
   fit           String
+  OrderProduct  OrderProduct[]
 }
 
 model Image {
@@ -72,12 +66,78 @@ model Catagory {
 }
 
 model Size {
-  id          String   @id @default(cuid())
-  title       String
-  measurement String
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  Product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId   String
+  id           String         @id @default(cuid())
+  title        String
+  measurement  String
+  description  String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Product      Product?       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId    String
+  OrderProduct OrderProduct[]
+}
+
+model Order {
+  id               String          @id @default(cuid())
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  address          Address         @relation(fields: [addressId], references: [id])
+  addressId        String
+  payment          Payment[]
+  extra            ExtraOrderInfo? @relation(fields: [extraOrderInfoId], references: [id])
+  extraOrderInfoId String?
+  products         OrderProduct[]
+}
+
+model OrderProduct {
+  id        String  @id @default(cuid())
+  quantity  Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  size      Size    @relation(fields: [sizeId], references: [id])
+  sizeId    String
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model ExtraOrderInfo {
+  id           String   @id @default(cuid())
+  orderStatus  String
+  deliveryCost Int      @default(0)
+  deliveryType String
+  deliveryDate DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orderId      String   @unique
+  Order        Order[]
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  total         Int
+  discount      Int      @default(0)
+  paymentType   String
+  paymentStatus Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  orderId       String
+  Order         Order    @relation(fields: [orderId], references: [id])
+}
+
+model Address {
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  address         String
+  city            String
+  state           String
+  country         String
+  pincode         Int
+  phoneNumber     String?
+  nearestLandmark String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  Order           Order[]
 }

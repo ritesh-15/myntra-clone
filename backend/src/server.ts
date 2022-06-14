@@ -9,24 +9,48 @@ import passport from "passport";
 import { passportJwt } from "./middlewares/passport-jwt";
 import cookieParser from "cookie-parser";
 import { productRouter } from "./routes/products_routes";
-import multer from "multer";
+import { userRouter } from "./routes/user_router";
+import RedisProvider from "./providers/redis_client";
+import { orderRouter } from "./routes/order_routes";
 
 const app: Application = express();
 
 const PORT = process.env.PORT || 9000;
 
+// redis connection
+const client = RedisProvider.getInstance();
+
+client.connect().then(() => {
+  console.log("Redis connected");
+});
+
 // middlewares
+
 app.use(express.json());
+
 app.use(cookieParser());
-app.use(cors());
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
+
 app.use(helmet());
+
 app.use(morgan("dev"));
+
 passport.initialize();
+
 passportJwt(passport);
 
 // routes
 app.use("/api/v1", authRouter);
 app.use("/api/v1", productRouter);
+app.use("/api/v1", userRouter);
+app.use("/api/v1", orderRouter);
 
 // error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -37,4 +61,8 @@ app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT} 🚀`);
+});
+
+process.on("SIGINT", () => {
+  client.quit();
 });

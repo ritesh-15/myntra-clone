@@ -17,4 +17,6 @@ router.route("/auth/resend-otp").post(authController.resendOtp);
 
 router.route("/auth/refresh").get(authController.refresh);
 
+router.route("/auth/logout").delete([authenticate], authController.logout);
+
 export { router as authRouter };

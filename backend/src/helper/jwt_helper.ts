@@ -11,7 +11,7 @@ class JwtHelper {
       expiresIn: "1h",
     });
     const refreshToken = jwt.sign({ id: userId }, REFRESH_TOKEN_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "30d",
     });
     return { accessToken, refreshToken };
   }

@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import JwtHelper from "../helper/jwt_helper";
 import UserDto from "../dtos/UserDto";
 import { UserInterface } from "../interfaces/UserInterface";
+import RedisProvider from "../providers/redis_client";
 
 interface RegisterBody {
   email: string;
@@ -116,12 +117,8 @@ class AuthController {
       // create jwt tokens
       const { accessToken, refreshToken } = JwtHelper.generateTokens(user.id);
 
-      await PrismaClientProvider.get().token.create({
-        data: {
-          userId: user.id,
-          token: refreshToken,
-        },
-      });
+      // set refresh token in cache
+      await RedisProvider.getInstance().set(user.id, refreshToken);
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -170,7 +167,7 @@ class AuthController {
 
       // check if otp matches
 
-      const [otphash, time] = hash.split(".");
+      const [otpHash, time] = hash.split(".");
 
       if (parseInt(time) < Date.now()) {
         return next(HttpError.badRequest("Otp is expired"));
@@ -182,7 +179,7 @@ class AuthController {
           email: email,
           expiresIn: parseInt(time),
         },
-        otphash
+        otpHash
       );
 
       if (!isOtpValid) {
@@ -201,12 +198,8 @@ class AuthController {
       // create jwt tokens
       const { accessToken, refreshToken } = JwtHelper.generateTokens(user.id);
 
-      await PrismaClientProvider.get().token.create({
-        data: {
-          userId: user.id,
-          token: refreshToken,
-        },
-      });
+      // set refresh token in cache
+      await RedisProvider.getInstance().set(user.id, refreshToken);
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -318,51 +311,29 @@ class AuthController {
 
     if (!recivedRefreshToken) {
       recivedRefreshToken = req.headers["authorization"];
-      recivedRefreshToken = recivedRefreshToken.split(" ");
+      if (recivedRefreshToken) {
+        recivedRefreshToken = recivedRefreshToken.split(" ")[1];
+      }
     }
 
     try {
-      // find the token in database
-      const token = await PrismaClientProvider.get().token.findUnique({
-        where: {
-          token: recivedRefreshToken,
-        },
-      });
+      // validate the token with jwt
+      const data = JwtHelper.validateRefreshToken(recivedRefreshToken);
+
+      // find the token in cache
+      const token = await RedisProvider.getInstance().get(data.id);
 
       if (token == null)
-        return next(HttpError.unauthorized("Token not found!"));
-
-      // validate the token with jwt
-      JwtHelper.validateRefreshToken(token.token);
-
-      // find the user with id
-      const user = await PrismaClientProvider.get().user.findUnique({
-        where: {
-          id: token.userId,
-        },
-      });
-
-      if (user == null) return next(HttpError.unauthorized("User not found!"));
+        return next(HttpError.unauthorized("Session expired!"));
 
       // generate new tokens
-      const { accessToken, refreshToken } = JwtHelper.generateTokens(
-        token.userId
-      );
+      const { accessToken, refreshToken } = JwtHelper.generateTokens(data.id);
 
-      // revoke previous tokens
-      await PrismaClientProvider.get().token.deleteMany({
-        where: {
-          userId: token.userId,
-        },
-      });
+      // revoke previous refresh token
+      await RedisProvider.getInstance().del(data.id);
 
-      // set new refresh token
-      await PrismaClientProvider.get().token.create({
-        data: {
-          userId: token.userId,
-          token: refreshToken,
-        },
-      });
+      // set token in redis
+      await RedisProvider.getInstance().set(data.id, refreshToken);
 
       // set cookies
       res.cookie("accessToken", accessToken, {
@@ -380,7 +351,6 @@ class AuthController {
           accessToken,
           refreshToken,
         },
-        user: new UserDto(user),
         ok: true,
       });
     } catch (error) {
@@ -396,11 +366,7 @@ class AuthController {
 
     try {
       // revoke previous tokens
-      await PrismaClientProvider.get().token.deleteMany({
-        where: {
-          userId: user.id,
-        },
-      });
+      await RedisProvider.getInstance().del(user.id);
 
       // clear cookies
       res.clearCookie("accessToken");

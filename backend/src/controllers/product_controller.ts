@@ -8,6 +8,8 @@ import {
   updateProductSchema,
   updateSizeSchema,
 } from "../validation/product";
+import RedisProvider from "../providers/redis_client";
+import { CATEGORIES } from "../constants";
 
 interface CreateProductBody {
   name: string;
@@ -180,6 +182,16 @@ class ProductController {
     if (!id) return next(HttpError.unporcessableEntity("Id not found!"));
 
     try {
+      // find product in cache
+      const foundInCache = await RedisProvider.getInstance().get(id);
+      if (foundInCache) {
+        return res.status(200).json({
+          ok: true,
+          message: "Product fetched successfully",
+          product: JSON.parse(foundInCache),
+        });
+      }
+
       const product = await PrismaClientProvider.get().product.findUnique({
         where: {
           id,
@@ -210,6 +222,9 @@ class ProductController {
 
       if (product == null)
         return next(HttpError.notFound("Product not found!"));
+
+      // set product in cache
+      await RedisProvider.getInstance().set(id, JSON.stringify(product));
 
       return res.status(200).json({
         ok: true,
@@ -520,12 +535,29 @@ class ProductController {
     next: NextFunction
   ) {
     try {
+      // find categories in cache
+      const foundCategories = await RedisProvider.getInstance().get(CATEGORIES);
+
+      if (foundCategories) {
+        return res.status(200).json({
+          ok: true,
+          categories: JSON.parse(foundCategories),
+          message: "Categories fetched successfully",
+        });
+      }
+
       const categories = await PrismaClientProvider.get().catagory.findMany({
         select: {
           id: true,
           name: true,
         },
       });
+
+      // save categories in cache
+      await RedisProvider.getInstance().set(
+        CATEGORIES,
+        JSON.stringify(categories)
+      );
 
       return res.status(200).json({
         ok: true,
@@ -551,6 +583,17 @@ class ProductController {
     if (!id) return next(HttpError.unporcessableEntity("Id not found!"));
 
     try {
+      // find in cache
+      const foundCategory = await RedisProvider.getInstance().get(id);
+
+      if (foundCategory) {
+        return res.status(200).json({
+          ok: true,
+          category: JSON.parse(foundCategory),
+          message: "Category fetched successfully",
+        });
+      }
+
       const category = await PrismaClientProvider.get().catagory.findUnique({
         where: {
           id,
@@ -585,6 +628,12 @@ class ProductController {
 
       if (category == null)
         return next(HttpError.notFound("Category not found!"));
+
+      // set in cache
+      await RedisProvider.getInstance().set(
+        category.id,
+        JSON.stringify(category)
+      );
 
       return res.status(200).json({
         ok: true,

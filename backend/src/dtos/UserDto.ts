@@ -18,6 +18,18 @@ class UserDto {
     this.isVerified = user.isVerified;
     this.isActive = user.isActive;
   }
+
+  toJson() {
+    return {
+      id: this.id,
+      name: this.name,
+      email: this.email,
+      phoneNumber: this.phoneNumber,
+      isAdmin: this.isAdmin,
+      isVerified: this.isVerified,
+      isActive: this.isActive,
+    };
+  }
 }
 
 export default UserDto;
