@@ -1,12 +1,17 @@
 export const LightTheme = {
   colors: {
     primary: "hsl(346, 100%, 62%)",
+    primaryLight: "hsl(346, 100%, 90%)",
     text: "hsl(0, 0%, 5%)",
     background: "hsl(0, 0%, 100%)",
     border: "hsl(0, 0%, 50%)",
     borderLight: "hsl(0, 0%, 80%)",
     hoverLight: "hsl(0, 0%, 95%)",
     white: "hsl(0, 0%, 100%)",
+    green: "hsl(136, 64%, 35%)",
+    shadow: "hsl(0, 0%, 91%)",
+    shadowDark: "hsl(0, 0%, 80%)",
+    cardBackground: "hsl(0, 0%, 100%)",
   },
   fontSize: {
     h1: "2.5rem",

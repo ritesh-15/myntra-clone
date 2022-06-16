@@ -1,6 +1,6 @@
 import { FC } from "react";
 import {
-  SidebarItem,
+  NavLinkStyle,
   SidebarItemsList,
   Title,
   Wrapper,
@@ -25,74 +25,96 @@ const Sidebar: FC = (): JSX.Element => {
       <Title>Main Menu</Title>
       <br />
       <SidebarItemsList>
-        <SidebarItem>
-          <Dashboard />
-          <span>Dashboard</span>
-        </SidebarItem>
+        <li>
+          <NavLinkStyle to={"/"}>
+            <Dashboard />
+            <span>Dashboard</span>
+          </NavLinkStyle>
+        </li>
       </SidebarItemsList>
 
       <Title>List Menu</Title>
       <br />
 
       <SidebarItemsList>
-        <SidebarItem active={true}>
-          <Inventory style={{ color: "#ffffff" }} />
-          <span>Products</span>
-        </SidebarItem>
-        <SidebarItem>
-          <AddShoppingCart />
-          <span>Orders</span>
-        </SidebarItem>
-        <SidebarItem>
-          <Group />
-          <span>Users</span>
-        </SidebarItem>
+        <li>
+          <NavLinkStyle to={"/products"}>
+            <Inventory />
+            <span>Products</span>
+          </NavLinkStyle>
+        </li>
+        <li>
+          <NavLinkStyle to={"/orders"}>
+            <AddShoppingCart />
+            <span>Orders</span>
+          </NavLinkStyle>
+        </li>
+        <li>
+          <NavLinkStyle to={"/customers"}>
+            <Group />
+            <span>Users</span>
+          </NavLinkStyle>
+        </li>
       </SidebarItemsList>
 
       <Title>Other Menu</Title>
       <br />
 
       <SidebarItemsList>
-        <SidebarItem>
-          <SsidChart />
-          <span>Status</span>
-        </SidebarItem>
-        <SidebarItem>
-          <Notifications />
-          <span>Notifications</span>
-        </SidebarItem>
+        <li>
+          <NavLinkStyle to={"/status"}>
+            <SsidChart />
+            <span>Status</span>
+          </NavLinkStyle>
+        </li>
+        <li>
+          <NavLinkStyle to={"/notifications"}>
+            <Notifications />
+            <span>Notifications</span>
+          </NavLinkStyle>
+        </li>
       </SidebarItemsList>
 
       <Title>Services</Title>
       <br />
 
       <SidebarItemsList>
-        <SidebarItem>
-          <HealthAndSafety />
-          <span>System Health</span>
-        </SidebarItem>
-        <SidebarItem>
-          <Psychology />
-          <span>Logs</span>
-        </SidebarItem>
-        <SidebarItem>
-          <Settings />
-          <span>Settings</span>
-        </SidebarItem>
+        <li>
+          <NavLinkStyle to={"/system/health"}>
+            <HealthAndSafety />
+            <span>System Health</span>
+          </NavLinkStyle>
+        </li>
+        <li>
+          <NavLinkStyle to={"/system/logs"}>
+            <Psychology />
+            <span>Logs</span>
+          </NavLinkStyle>
+        </li>
+        <li>
+          <NavLinkStyle to={"/system/setting"}>
+            <Settings />
+            <span>Settings</span>
+          </NavLinkStyle>
+        </li>
       </SidebarItemsList>
 
       <Title>Account</Title>
       <br />
 
       <SidebarItemsList>
-        <SidebarItem>
-          <Person />
-          <span>Profile</span>
-        </SidebarItem>
-        <SidebarItem>
-          <Logout />
-          <span>Log out</span>
-        </SidebarItem>
+        <li>
+          <NavLinkStyle to={"/account"}>
+            <Person />
+            <span>Profile</span>
+          </NavLinkStyle>
+        </li>
+        <li>
+          <NavLinkStyle to={"/logout"}>
+            <Logout />
+            <span>Log out</span>
+          </NavLinkStyle>
+        </li>
       </SidebarItemsList>
     </Wrapper>
   );

@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
 export const Wrapper = styled.div`
@@ -17,31 +18,44 @@ export const Title = styled.h1`
 
 export const SidebarItemsList = styled.ul`
   list-style: none;
+
+  li {
+    color: ${({ theme }) => theme.colors.text};
+
+    a {
+      display: flex;
+      align-items: center;
+      padding: 0.75em;
+      background-color: ${({ theme }) => theme.colors.background};
+      border-radius: 0.25em;
+      margin-bottom: 0.75em;
+      cursor: pointer;
+      transition: background 0.5ms ease-in-out;
+      color: inherit;
+
+      &:hover {
+        background-color: ${({ theme }) => theme.colors.hoverLight};
+      }
+
+      span {
+        margin-left: 0.5em;
+        color: ${({ theme }) => theme.colors.text};
+      }
+    }
+  }
 `;
 
-interface SidebarItemInterface {
-  active?: boolean;
-}
+export const NavLinkStyle = styled(NavLink)`
+  &.active {
+    color: ${({ theme }) => theme.colors.white} !important;
+    background: ${({ theme }) => theme.colors.primary};
 
-export const SidebarItem = styled.li<SidebarItemInterface>`
-  display: flex;
-  align-items: center;
-  padding: 0.75em;
-  background-color: ${({ theme, active }) =>
-    active ? theme.colors.primary : theme.colors.background};
-  border-radius: 0.25em;
-  margin-bottom: 0.75em;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
+    &:hover {
+      background: ${({ theme }) => theme.colors.primary};
+    }
 
-  &:hover {
-    background-color: ${({ theme, active }) =>
-      !active && theme.colors.hoverLight};
-  }
-
-  span {
-    margin-left: 0.5em;
-    color: ${({ theme, active }) =>
-      active ? theme.colors.white : theme.colors.text};
+    span {
+      color: ${({ theme }) => theme.colors.white};
+    }
   }
 `;

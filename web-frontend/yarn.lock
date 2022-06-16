@@ -1657,7 +1657,7 @@
   resolved "https://registry.yarnpkg.com/@mui/types/-/types-7.1.4.tgz#4185c05d6df63ec673cda15feab80440abadc764"
   integrity sha512-uveM3byMbthO+6tXZ1n2zm0W3uJCQYtwt/v5zV5I77v2v18u0ITkb8xwhsDD2i3V2Kye7SaNR6FFJ6lMuY/WqQ==
 
-"@mui/utils@^5.8.4":
+"@mui/utils@^5.4.1", "@mui/utils@^5.8.4":
   version "5.8.4"
   resolved "https://registry.yarnpkg.com/@mui/utils/-/utils-5.8.4.tgz#5c46b5900bd2452b3ce54a7a1c94a3e2a8a75c34"
   integrity sha512-BHYErfrjqqh76KaDAm8wZlhEip1Uj7Cmco65NcsF3BWrAl3FWngACpaPZeEbTgmaEwyWAQEE6LZhsmy43hfyqQ==
@@ -1667,6 +1667,17 @@
     "@types/react-is" "^16.7.1 || ^17.0.0"
     prop-types "^15.8.1"
     react-is "^17.0.2"
+
+"@mui/x-data-grid@^5.12.1":
+  version "5.12.1"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-5.12.1.tgz#72a27ed1bbe3368147d9734b7730f0e535583ec2"
+  integrity sha512-kOhmCqaI87c411uUHnojsaSgebvzkMbQXtw0lVGmNDcxWTugsxH0n7FC7+KVOc/EKyGRifvgIpiKKB17BI61pg==
+  dependencies:
+    "@babel/runtime" "^7.17.2"
+    "@mui/utils" "^5.4.1"
+    clsx "^1.1.1"
+    prop-types "^15.8.1"
+    reselect "^4.1.5"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -3218,6 +3229,11 @@ charcodes@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/charcodes/-/charcodes-0.2.0.tgz#5208d327e6cc05f99eb80ffc814707572d1f14e4"
   integrity sha512-Y4kiDb+AM4Ecy58YkuZrrSRJBDQdQ2L+NyS1vHHFtNtUjgutcZfx3yp1dAONI/oPaPmyGfCLx5CxL+zauIMyKQ==
+
+chart.js@^3.8.0:
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-3.8.0.tgz#c6c14c457b9dc3ce7f1514a59e9b262afd6f1a94"
+  integrity sha512-cr8xhrXjLIXVLOBZPkBZVF6NDeiVIrPLHcMhnON7UufudL+CNeRrD+wpYanswlm8NpudMdrt3CHoLMQMxJhHRg==
 
 check-types@^11.1.1:
   version "11.1.2"
@@ -7460,6 +7476,11 @@ react-app-polyfill@^3.0.0:
     regenerator-runtime "^0.13.9"
     whatwg-fetch "^3.6.2"
 
+react-chartjs-2@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/react-chartjs-2/-/react-chartjs-2-4.2.0.tgz#bc5693a8b161f125301cf28ab0fe980d7dce54aa"
+  integrity sha512-9Vm9Sg9XAKiR579/FnBkesofjW9goaaFLfS7XlGTzUJlWFZGSE6A/pBI6+i/bP3pobKZoFcWJdFnjShytToqXw==
+
 react-dev-utils@^12.0.1:
   version "12.0.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-12.0.1.tgz#ba92edb4a1f379bd46ccd6bcd4e7bc398df33e73"
@@ -7758,6 +7779,11 @@ requires-port@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==
+
+reselect@^4.1.5:
+  version "4.1.6"
+  resolved "https://registry.yarnpkg.com/reselect/-/reselect-4.1.6.tgz#19ca2d3d0b35373a74dc1c98692cdaffb6602656"
+  integrity sha512-ZovIuXqto7elwnxyXbBtCPo9YFEr3uJqj2rRbcOOog1bmu2Ag85M4hixSwFWyaBMKXNgvPaJ9OSu9SkBPIeJHQ==
 
 resolve-cwd@^3.0.0:
   version "3.0.0"

@@ -2,11 +2,16 @@ export const DarkTheme = {
   colors: {
     primary: "hsl(346, 100%, 62%)",
     text: "hsl(0, 0%, 94%)",
-    background: "hsl(346, 0%, 11%)",
+    background: "hsl(0, 0%, 0%)",
     border: "hsl(0, 0%, 50%)",
     borderLight: "hsl(0, 0%, 30%)",
-    hoverLight: "hsl(0, 0%, 95%)",
+    hoverLight: "hsl(0, 0%, 15%)",
     white: "hsl(0, 0%, 100%)",
+    green: "hsl(136, 64%, 35%)",
+    primaryLight: "hsl(346, 100%, 90%)",
+    shadow: "hsl(0, 0%, 0%)",
+    cardBackground: "hsl(0, 0%, 20%)",
+    shadowDark: "hsl(0, 0%, 0%)",
   },
   fontSize: {
     h1: "2.5rem",

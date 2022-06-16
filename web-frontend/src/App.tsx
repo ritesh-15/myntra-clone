@@ -1,6 +1,8 @@
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
 import { Navbar, Sidebar } from "./components";
 import GlobalStyle from "./global/GlobalStyle";
+import { Dashboard, Products } from "./pages";
 import { DarkTheme } from "./theme/DarkTheme";
 import { LightTheme } from "./theme/LightTheme";
 
@@ -12,15 +14,27 @@ const Main = styled.main`
 
 const App = () => {
   return (
-    <ThemeProvider theme={DarkTheme}>
-      <>
-        <GlobalStyle />
-        <Navbar />
-        <Main>
-          <Sidebar />
-          <div style={{ background: "hsl(346, 0%, 11%)" }} />
-        </Main>
-      </>
+    <ThemeProvider theme={LightTheme}>
+      <GlobalStyle />
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Navbar />
+                <Main>
+                  <Sidebar />
+                  <Outlet />
+                </Main>
+              </>
+            }
+          >
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/products" element={<Products />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 };
