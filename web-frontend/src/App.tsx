@@ -2,7 +2,7 @@ import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
 import { Navbar, Sidebar } from "./components";
 import GlobalStyle from "./global/GlobalStyle";
-import { Dashboard, Products } from "./pages";
+import { CreateProduct, Dashboard, Products } from "./pages";
 import { DarkTheme } from "./theme/DarkTheme";
 import { LightTheme } from "./theme/LightTheme";
 
@@ -31,7 +31,18 @@ const App = () => {
             }
           >
             <Route path="/" element={<Dashboard />} />
-            <Route path="/products" element={<Products />} />
+
+            <Route
+              path="products"
+              element={
+                <>
+                  <Outlet />
+                </>
+              }
+            >
+              <Route path="create" element={<CreateProduct />} />
+              <Route path="" element={<Products />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

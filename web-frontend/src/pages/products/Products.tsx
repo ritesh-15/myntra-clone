@@ -1,51 +1,121 @@
 import { FC } from "react";
-import { ProductsWrapper, Wrapper } from "./Product.styled";
+import {
+  ProductsTopHeading,
+  ProductsWrapper,
+  ProductTopBarAction,
+  ProductTopBarWrapper,
+  SearchOutlinedIcon,
+  SearchWrapper,
+  Wrapper,
+} from "./Product.styled";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
-import { Button } from "../../components";
+import { Button, Table } from "../../components";
 import { Add } from "@mui/icons-material";
+import { Link, Outlet } from "react-router-dom";
 
-const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "name", headerName: "Name", width: 130 },
-  { field: "category", headerName: "Category", width: 130 },
+const columns = [
   {
-    field: "stock",
-    headerName: "Stock",
-    width: 160,
+    field: "id",
+    headerName: "ID",
   },
   {
-    field: "date create",
-    headerName: "Date Create",
-    width: 90,
+    field: "productName",
+    headerName: "Product Name",
+  },
+  {
+    field: "category",
+    headerName: "Category",
+  },
+  {
+    field: "createdAt",
+    headerName: "Created At",
   },
 ];
 
 const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
+  {
+    id: "1",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "2",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "3",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "4",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "4",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "4",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "4",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "4",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "4",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
+  {
+    id: "4",
+    productName: "Product 1",
+    category: "Category 1",
+    createdAt: "2020-01-01",
+  },
 ];
 
 const Products: FC = (): JSX.Element => {
   return (
     <Wrapper>
+      <ProductTopBarWrapper>
+        <ProductsTopHeading>
+          <h5>Products Listed</h5>
+        </ProductsTopHeading>
+        <ProductTopBarAction>
+          <SearchWrapper>
+            <SearchOutlinedIcon />
+            <input type="text" placeholder="Search" />
+          </SearchWrapper>
+          <Link to={"create"}>
+            <Button title="Add Product" icon={<Add />} />
+          </Link>
+        </ProductTopBarAction>
+      </ProductTopBarWrapper>
+
       <ProductsWrapper style={{ height: 400, width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[10]}
-          checkboxSelection
-        />
+        <Table columns={columns} rows={rows} />
       </ProductsWrapper>
-      <br />
-      <Button title="Add Product" icon={<Add />} />
     </Wrapper>
   );
 };

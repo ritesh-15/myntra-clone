@@ -1,6 +1,6 @@
 import { Add } from "@mui/icons-material";
 import { FC } from "react";
-import { Wrapper } from "./Button.styled";
+import { Loading, Wrapper } from "./Button.styled";
 
 interface ButtonProps {
   onClick?: () => void;
@@ -15,11 +15,12 @@ const Button: FC<ButtonProps> = ({
   title,
   icon,
   disabled,
+  loading,
 }): JSX.Element => {
   return (
-    <Wrapper>
+    <Wrapper loading={loading} disabled={disabled}>
       <button>
-        {icon && icon}
+        {!loading && icon ? icon : <Loading />}
         <span>{title}</span>
       </button>
     </Wrapper>

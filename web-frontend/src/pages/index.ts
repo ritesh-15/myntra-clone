@@ -1,3 +1,5 @@
 import Dashboard from "./dashboard/Dashboard";
 import Products from "./products/Products";
-export { Dashboard, Products };
+import CreateProduct from "./create-product/CreateProduct";
+
+export { Dashboard, Products, CreateProduct };

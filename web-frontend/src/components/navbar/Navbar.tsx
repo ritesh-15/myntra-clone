@@ -14,7 +14,7 @@ const Navbar: FC = (): JSX.Element => {
       <Wrapper>
         <LogoWrapper>
           <LogoContainer>
-            <img src="assets/images/logo.png" alt="logo" />
+            <img src="/assets/images/logo.png" alt="logo" />
             <h1>Myntra</h1>
           </LogoContainer>
         </LogoWrapper>
