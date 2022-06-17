@@ -1,24 +1,27 @@
+import { AddOutlined, DeleteOutline, Save } from "@mui/icons-material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { ChangeEvent, FC, FormEvent, useState } from "react";
+import { Button, Input, Textarea } from "../../components";
 import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TableBody,
-} from "@mui/material";
-import { ChangeEvent, FC, useEffect, useState } from "react";
-import { Input, Textarea } from "../../components";
-import {
+  Flex,
   Form,
   Heading,
+  ImagesTable,
+  Label,
   Row,
-  SizeHeading,
   SizeTable,
+  SubHeading,
   Wrapper,
 } from "./CreateProduct.styled";
 
+interface SizeInterface {
+  title: string;
+  description: string;
+  measurement: string;
+}
+
 const CreateProduct: FC = (): JSX.Element => {
-  const [sizeCount, setSizeCount] = useState(1);
-  const [sizes, setSizes] = useState([
+  const [sizes, setSizes] = useState<SizeInterface[]>([
     {
       title: "",
       description: "",
@@ -26,28 +29,23 @@ const CreateProduct: FC = (): JSX.Element => {
     },
   ]);
 
-  useEffect(() => {
-    console.log(sizes);
-  }, [sizes]);
+  const [images, setImages] = useState<File[]>([]);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
-    const data = sizes.find((data, i) => {
+    const data = sizes.map((size, i) => {
       if (i == index) {
-        return { ...data, [e.target.name]: e.target.value };
+        return { ...size, [e.target.name]: e.target.value };
       }
+
+      return size;
     });
 
-    if (!data) return;
-
-    sizes[index] = data;
-
-    setSizes(sizes);
-
-    console.log(sizes);
+    setSizes(data);
   };
 
-  const addMoreRows = () => {
-    setSizeCount(sizeCount + 1);
+  const addMoreRows = (e: FormEvent) => {
+    e.preventDefault();
+
     setSizes([
       ...sizes,
       {
@@ -60,6 +58,29 @@ const CreateProduct: FC = (): JSX.Element => {
 
   const removeRow = (index: number) => {
     setSizes(sizes.filter((data, i) => i != index));
+  };
+
+  const chooseImage = (e: ChangeEvent<HTMLInputElement>) => {
+    // get current files
+    const files = e.target.files;
+
+    if (!files) return;
+
+    const data: File[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].type.includes("image")) {
+        data.push(files[i]);
+      }
+    }
+
+    if (data.length != 0) {
+      setImages([...images, ...data]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
   };
 
   return (
@@ -107,7 +128,7 @@ const CreateProduct: FC = (): JSX.Element => {
           </FormControl>
         </Row>
 
-        <SizeHeading>Sizes</SizeHeading>
+        <SubHeading>Sizes</SubHeading>
 
         <SizeTable>
           <table>
@@ -127,6 +148,7 @@ const CreateProduct: FC = (): JSX.Element => {
                       type="text"
                       name="title"
                       onChange={(e) => onChange(e, index)}
+                      value={size.title}
                     />
                   </td>
                   <td>
@@ -134,6 +156,7 @@ const CreateProduct: FC = (): JSX.Element => {
                       type="text"
                       name="measurement"
                       onChange={(e) => onChange(e, index)}
+                      value={size.measurement}
                     />
                   </td>
                   <td>
@@ -141,21 +164,107 @@ const CreateProduct: FC = (): JSX.Element => {
                       type="text"
                       name="description"
                       onChange={(e) => onChange(e, index)}
+                      value={size.description}
                     />
                   </td>
                   <td>
-                    {index == sizes.length - 1 && (
-                      <button onClick={addMoreRows}>Add</button>
-                    )}
-                    {index != 0 && (
-                      <button onClick={() => removeRow(index)}>Remove</button>
-                    )}
+                    <Flex>
+                      {index == sizes.length - 1 && (
+                        <Button
+                          type="button"
+                          icon={<AddOutlined />}
+                          onClick={addMoreRows}
+                        />
+                      )}
+                      {index != 0 && (
+                        <Button
+                          outlined
+                          icon={<DeleteOutline />}
+                          onClick={() => removeRow(index)}
+                          type="button"
+                        />
+                      )}
+                    </Flex>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </SizeTable>
+
+        <SubHeading>Images</SubHeading>
+
+        <ImagesTable>
+          <table>
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Image Name</th>
+                <th>Image Size</th>
+              </tr>
+            </thead>
+            <tbody>
+              {images.length == 0 ? (
+                <tr>
+                  <td>
+                    <Label htmlFor="chooseImage">Choose image</Label>
+                    <input
+                      id="chooseImage"
+                      style={{ display: "none" }}
+                      type="file"
+                      accept="image/jpeg, image/png, image/jpg"
+                      multiple={true}
+                      onChange={chooseImage}
+                    />
+                  </td>
+                </tr>
+              ) : (
+                images.map((image, index) => (
+                  <tr>
+                    <td>
+                      <Flex>
+                        {index == images.length - 1 && (
+                          <>
+                            <Label
+                              style={{ marginRight: "1em" }}
+                              htmlFor="chooseImage"
+                            >
+                              Choose more
+                            </Label>
+                            <input
+                              id="chooseImage"
+                              style={{ display: "none" }}
+                              type="file"
+                              accept="image/jpeg, image/png, image/jpg"
+                              multiple={true}
+                              onChange={chooseImage}
+                            />
+                          </>
+                        )}
+                        <Button
+                          type="button"
+                          icon={<DeleteOutline />}
+                          outlined
+                          onClick={() => removeFile(index)}
+                        />
+                      </Flex>
+                    </td>
+                    <td>{image.name}</td>
+                    <td>{image.size}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </ImagesTable>
+
+        <br />
+
+        <Button
+          style={{ width: "100%", maxWidth: "200px" }}
+          title="Create"
+          icon={<Save />}
+        />
       </Form>
     </Wrapper>
   );

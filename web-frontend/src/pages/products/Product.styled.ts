@@ -6,7 +6,9 @@ export const Wrapper = styled.div`
   background: ${({ theme }) => theme.colors.background};
 `;
 
-export const ProductsWrapper = styled.div``;
+export const ProductsWrapper = styled.div`
+  background: ${({ theme }) => theme.colors.cardBackground};
+`;
 
 export const ProductTopBarWrapper = styled.div`
   margin-bottom: 2em;

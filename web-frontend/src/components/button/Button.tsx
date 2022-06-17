@@ -1,27 +1,37 @@
-import { Add } from "@mui/icons-material";
 import { FC } from "react";
 import { Loading, Wrapper } from "./Button.styled";
 
-interface ButtonProps {
-  onClick?: () => void;
-  title: string;
+interface ButtonProps
+  extends React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  > {
+  title?: string;
   icon?: React.ReactElement;
   disabled?: boolean;
   loading?: boolean;
+  outlined?: boolean;
 }
 
 const Button: FC<ButtonProps> = ({
-  onClick,
   title,
   icon,
   disabled,
   loading,
+  outlined,
+  ...props
 }): JSX.Element => {
   return (
-    <Wrapper loading={loading} disabled={disabled}>
-      <button>
-        {!loading && icon ? icon : <Loading />}
-        <span>{title}</span>
+    <Wrapper outlined={outlined} loading={loading} disabled={disabled}>
+      <button {...props}>
+        {loading ? (
+          <Loading style={{ marginRight: "1em" }} />
+        ) : icon ? (
+          icon
+        ) : (
+          ""
+        )}
+        {title && <span>{title}</span>}
       </button>
     </Wrapper>
   );

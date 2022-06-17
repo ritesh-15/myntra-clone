@@ -3,6 +3,7 @@ export const LightTheme = {
     primary: "hsl(346, 100%, 62%)",
     primaryLight: "hsl(346, 100%, 90%)",
     text: "hsl(0, 0%, 5%)",
+    textLight: "hsl(0, 0%, 30%)",
     background: "hsl(0, 0%, 100%)",
     border: "hsl(0, 0%, 50%)",
     borderLight: "hsl(0, 0%, 80%)",

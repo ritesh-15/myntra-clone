@@ -4,6 +4,8 @@ export const TableContainer = styled.div`
   overflow-x: auto;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
+  background: ${({ theme }) => theme.colors.cardBackground};
+  width: 100%;
 
   &::-webkit-scrollbar {
     height: 7px;
@@ -24,7 +26,7 @@ export const TableWrapper = styled.table`
   font-family: inherit;
   box-shadow: -2px 7px 5px 0px ${({ theme }) => theme.colors.shadow};
   border-radius: 0.25em;
-  max-width: 600px;
+  min-width: 700px;
   overflow: hidden;
 `;
 
@@ -40,7 +42,7 @@ export const TableBody = styled.tbody``;
 
 export const TR = styled.tr`
   &:nth-child(even) {
-    background-color: #f5f5f5;
+    background-color: ${({ theme }) => theme.colors.hoverLight};
   }
 `;
 

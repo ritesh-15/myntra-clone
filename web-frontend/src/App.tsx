@@ -14,7 +14,7 @@ const Main = styled.main`
 
 const App = () => {
   return (
-    <ThemeProvider theme={LightTheme}>
+    <ThemeProvider theme={DarkTheme}>
       <GlobalStyle />
       <BrowserRouter>
         <Routes>

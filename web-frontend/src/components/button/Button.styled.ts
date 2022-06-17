@@ -3,15 +3,20 @@ import styled from "styled-components";
 export const Wrapper = styled.div<{
   loading?: boolean;
   disabled?: boolean;
+  outlined?: boolean;
 }>`
   button {
     border: none;
-    background: ${({ theme, loading, disabled }) => {
+    background: ${({ theme, loading, disabled, outlined }) => {
+      if (outlined) return theme.colors.cardBackground;
       if (loading || disabled) return theme.colors.disabled;
       return theme.colors.primary;
     }};
     padding: 0.5em 1em;
-    color: #fff;
+    color: ${({ theme, outlined }) => {
+      if (outlined) return theme.colors.primary;
+      return theme.colors.white;
+    }};
     border-radius: 0.25em;
     box-shadow: -2px 7px 5px 0px ${({ theme }) => theme.colors.shadow};
     transition: all 0.2s ease-in-out;
@@ -21,10 +26,11 @@ export const Wrapper = styled.div<{
     }};
     display: flex;
     align-items: center;
-
-    span {
-      margin-left: 0.5em;
-    }
+    border: 1px solid
+      ${({ theme, outlined }) => {
+        if (outlined) return theme.colors.primary;
+        return "transparent";
+      }};
 
     &:hover {
       box-shadow: -2px 7px 10px 0px ${({ theme }) => theme.colors.shadowDark};

@@ -5,6 +5,7 @@ export const Wrapper = styled.div`
   height: 100%;
   min-height: 100px;
   width: 100%;
+  background: ${({ theme }) => theme.colors.background};
 
   textarea {
     border: none;
@@ -16,6 +17,8 @@ export const Wrapper = styled.div`
     font-size: 1rem;
     resize: none;
     min-height: 100px;
+    background: transparent;
+    color: ${({ theme }) => theme.colors.text};
   }
 
   small {
@@ -35,7 +38,7 @@ export const Wrapper = styled.div`
       font-size: 0.75em;
       color: ${({ theme }) => theme.colors.primary};
       z-index: 50;
-      background: #fff;
+      background: ${({ theme }) => theme.colors.background};
       width: fit-content;
       padding: 0 0.25em;
     }
@@ -48,7 +51,7 @@ export const Wrapper = styled.div`
     width: 100%;
     pointer-events: none;
     height: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid ${({ theme }) => theme.colors.borderLight};
     border-radius: 0.25em;
     transition: all 0.5ms ease;
 
