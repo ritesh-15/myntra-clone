@@ -10,19 +10,19 @@ export const Wrapper = styled.div`
   textarea {
     border: none;
     width: 100%;
+    min-height: 100px;
     outline: none;
     padding-top: 10px;
     padding-left: 14px;
     padding-right: 14px;
     font-size: 1rem;
     resize: none;
-    min-height: 100px;
     background: transparent;
     color: ${({ theme }) => theme.colors.text};
   }
 
   small {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     display: block;
     color: ${({ theme }) => theme.colors.red};
   }

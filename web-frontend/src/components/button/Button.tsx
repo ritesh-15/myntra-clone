@@ -22,7 +22,12 @@ const Button: FC<ButtonProps> = ({
   ...props
 }): JSX.Element => {
   return (
-    <Wrapper outlined={outlined} loading={loading} disabled={disabled}>
+    <Wrapper
+      icon={icon && true}
+      outlined={outlined}
+      loading={loading}
+      disabled={disabled}
+    >
       <button {...props}>
         {loading ? (
           <Loading style={{ marginRight: "1em" }} />

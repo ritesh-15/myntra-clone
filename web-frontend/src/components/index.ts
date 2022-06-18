@@ -5,5 +5,15 @@ import Button from "./button/Button";
 import Table from "./table/Table";
 import Input from "./input/Input";
 import Textarea from "./textarea/Textarea";
+import SelectBox from "./select/Select";
 
-export { Navbar, Sidebar, DashboardCard, Button, Table, Input, Textarea };
+export {
+  Navbar,
+  Sidebar,
+  DashboardCard,
+  Button,
+  Table,
+  Input,
+  Textarea,
+  SelectBox,
+};

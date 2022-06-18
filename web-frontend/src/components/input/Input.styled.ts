@@ -20,8 +20,8 @@ export const Wrapper = styled.div`
   }
 
   small {
-    font-size: 0.75rem;
-    margin-bottom: 2em;
+    font-size: 0.85rem;
+    margin-top: 0.25em;
     display: block;
     color: ${({ theme }) => theme.colors.red};
   }

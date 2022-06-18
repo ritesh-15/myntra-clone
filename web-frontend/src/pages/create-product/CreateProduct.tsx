@@ -1,8 +1,12 @@
 import { AddOutlined, DeleteOutline, Save } from "@mui/icons-material";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { ChangeEvent, FC, FormEvent, useState } from "react";
-import { Button, Input, Textarea } from "../../components";
+import { ChangeEvent, FC, FormEvent, useEffect, useState } from "react";
+import { useSnackBar } from "../../app/hooks/useSnackBar";
+import { Button, Input, SelectBox, Textarea } from "../../components";
+import { useForm } from "../../hooks/useForm";
+import { CreateProductForm } from "../../interfaces/product/CreateProductInterface";
+import ProductValidation from "../../validations/ProductValidation";
 import {
+  FieldHeading,
   Flex,
   Form,
   Heading,
@@ -20,6 +24,8 @@ interface SizeInterface {
   measurement: string;
 }
 
+const categories = ["Men", "Women"];
+
 const CreateProduct: FC = (): JSX.Element => {
   const [sizes, setSizes] = useState<SizeInterface[]>([
     {
@@ -30,6 +36,34 @@ const CreateProduct: FC = (): JSX.Element => {
   ]);
 
   const [images, setImages] = useState<File[]>([]);
+
+  const [category, changeCategory] = useState<string>("");
+
+  const { showSnackbar } = useSnackBar();
+
+  // submit form
+  const submitForm = (values: CreateProductForm) => {};
+
+  // form state
+  const { errors, values, handleChange, handleSubmit } =
+    useForm<CreateProductForm>(
+      {
+        title: "",
+        description: "",
+        fit: "",
+        fabric: "",
+        stocks: "",
+        originalPrice: "",
+      },
+      ProductValidation.validateCreateProduct,
+      submitForm
+    );
+
+  useEffect(() => {
+    if (Object(errors).keys !== 0) {
+      showSnackbar(errors);
+    }
+  }, [errors]);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     const data = sizes.map((size, i) => {
@@ -88,44 +122,66 @@ const CreateProduct: FC = (): JSX.Element => {
       <Heading>Create A New Product</Heading>
       <Form>
         <Row>
-          <label>Product Name</label>
-          <Input title="Product Name" />
+          <FieldHeading>Product Name</FieldHeading>
+          <Input
+            name="title"
+            onChange={handleChange}
+            value={values.title}
+            title="Product Name"
+            error={errors.title}
+          />
         </Row>
         <Row>
-          <label>Description</label>
-          <Textarea title="Description" />
+          <FieldHeading>Description</FieldHeading>
+          <Textarea
+            name="description"
+            onChange={handleChange}
+            value={values.description}
+            title="Description"
+          />
         </Row>
 
         <Row>
-          <label>Price</label>
-          <Input title="Price" />
+          <FieldHeading>Price</FieldHeading>
+          <Input
+            name="originalPrice"
+            onChange={handleChange}
+            value={values.originalPrice}
+            title="Price"
+            error={errors.originalPrice}
+          />
         </Row>
 
         <Row>
-          <label>Fabric</label>
+          <FieldHeading>Fabric</FieldHeading>
 
-          <Input title="Fabric" />
+          <Input
+            name="fabric"
+            onChange={handleChange}
+            value={values.fabric}
+            title="Fabric"
+            error={errors.fabric}
+          />
         </Row>
         <Row>
-          <label>Fit</label>
-
-          <Input title="Fit" />
+          <FieldHeading>Fit</FieldHeading>
+          <Input
+            name="fit"
+            onChange={handleChange}
+            value={values.fit}
+            title="Fit"
+            error={errors.fit}
+          />
         </Row>
         <Row>
-          <label>Category</label>
+          <FieldHeading>Category</FieldHeading>
 
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Age</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              label="Age"
-            >
-              <MenuItem value={10}>Ten</MenuItem>
-              <MenuItem value={20}>Twenty</MenuItem>
-              <MenuItem value={30}>Thirty</MenuItem>
-            </Select>
-          </FormControl>
+          <SelectBox
+            options={categories}
+            current={category}
+            changeCurrent={(value) => changeCategory(value)}
+            label="choose category"
+          />
         </Row>
 
         <SubHeading>Sizes</SubHeading>
@@ -261,7 +317,8 @@ const CreateProduct: FC = (): JSX.Element => {
         <br />
 
         <Button
-          style={{ width: "100%", maxWidth: "200px" }}
+          type="submit"
+          onClick={handleSubmit}
           title="Create"
           icon={<Save />}
         />

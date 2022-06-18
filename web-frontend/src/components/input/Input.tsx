@@ -13,7 +13,7 @@ interface InputProps
 const Input: FC<InputProps> = (props): JSX.Element => {
   return (
     <Wrapper>
-      <input {...props} autoComplete="off" required />
+      <input {...props} required />
       <label>
         <span>{props.title}</span>
       </label>

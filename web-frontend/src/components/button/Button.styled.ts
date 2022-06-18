@@ -4,6 +4,7 @@ export const Wrapper = styled.div<{
   loading?: boolean;
   disabled?: boolean;
   outlined?: boolean;
+  icon?: boolean;
 }>`
   button {
     border: none;
@@ -31,6 +32,10 @@ export const Wrapper = styled.div<{
         if (outlined) return theme.colors.primary;
         return "transparent";
       }};
+
+    span {
+      margin-left: ${({ icon }) => (icon ? "1em" : "0")};
+    }
 
     &:hover {
       box-shadow: -2px 7px 10px 0px ${({ theme }) => theme.colors.shadowDark};

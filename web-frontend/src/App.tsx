@@ -1,5 +1,7 @@
+import { Alert, Snackbar } from "@mui/material";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
+import { useSnackBar } from "./app/hooks/useSnackBar";
 import { Navbar, Sidebar } from "./components";
 import GlobalStyle from "./global/GlobalStyle";
 import { CreateProduct, Dashboard, Products } from "./pages";
@@ -13,9 +15,20 @@ const Main = styled.main`
 `;
 
 const App = () => {
+  const { open, message } = useSnackBar();
+
   return (
-    <ThemeProvider theme={DarkTheme}>
+    <ThemeProvider theme={LightTheme}>
       <GlobalStyle />
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        open={open}
+        autoHideDuration={6000}
+      >
+        <Alert severity="success" sx={{ width: "100%" }}>
+          {message}
+        </Alert>
+      </Snackbar>
       <BrowserRouter>
         <Routes>
           <Route

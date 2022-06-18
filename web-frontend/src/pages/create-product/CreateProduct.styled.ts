@@ -21,14 +21,7 @@ export const Heading = styled.h4`
 export const Row = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 1em;
-
-  label {
-    flex: 1;
-    text-align: left;
-    display: block;
-    color: ${({ theme }) => theme.colors.text};
-  }
+  margin-bottom: 2em;
 
   div {
     flex: 1;
@@ -37,12 +30,6 @@ export const Row = styled.div`
   @media (min-width: 768px) {
     flex-direction: row;
     align-items: center;
-
-    label {
-      flex: 0.25;
-      text-align: right;
-      margin-right: 2em;
-    }
 
     div {
       flex: 0.5;
@@ -158,4 +145,17 @@ export const Label = styled.label`
 export const Flex = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const FieldHeading = styled.label`
+  flex: 1;
+  text-align: left;
+  display: block;
+  color: ${({ theme }) => theme.colors.text};
+
+  @media (min-width: 768px) {
+    flex: 0.25;
+    text-align: right;
+    margin-right: 2em;
+  }
 `;

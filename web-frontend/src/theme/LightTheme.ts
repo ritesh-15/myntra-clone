@@ -14,6 +14,7 @@ export const LightTheme = {
     shadowDark: "hsl(0, 0%, 80%)",
     cardBackground: "hsl(0, 0%, 100%)",
     disabled: "hsl(214, 6%, 66%)",
+    red: "hsl(8, 100%, 48%)",
   },
   fontSize: {
     h1: "2.5rem",
