@@ -2,9 +2,12 @@ import { Alert, Snackbar } from "@mui/material";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
 import { useSnackBar } from "./app/hooks/useSnackBar";
-import { Navbar, Sidebar } from "./components";
+import { LoadingScreen, Navbar, Sidebar } from "./components";
 import GlobalStyle from "./global/GlobalStyle";
-import { CreateProduct, Dashboard, Products } from "./pages";
+import { useRefresh } from "./hooks/useRefresh";
+import { CreateProduct, Dashboard, Login, Products } from "./pages";
+import LoginRoute from "./routes/LoginRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import { DarkTheme } from "./theme/DarkTheme";
 import { LightTheme } from "./theme/LightTheme";
 
@@ -15,36 +18,30 @@ const Main = styled.main`
 `;
 
 const App = () => {
-  const { open, message } = useSnackBar();
+  const isLoading = useRefresh();
+  const { open, message, error, handleClose } = useSnackBar();
+
+  if (isLoading)
+    return (
+      <ThemeProvider theme={LightTheme}>
+        <LoadingScreen />
+      </ThemeProvider>
+    );
 
   return (
     <ThemeProvider theme={LightTheme}>
       <GlobalStyle />
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        open={open}
-        autoHideDuration={6000}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          {message}
-        </Alert>
-      </Snackbar>
+      {open && (
+        <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+          <Alert severity={error ? "error" : "success"} sx={{ width: "100%" }}>
+            {message}
+          </Alert>
+        </Snackbar>
+      )}
       <BrowserRouter>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Navbar />
-                <Main>
-                  <Sidebar />
-                  <Outlet />
-                </Main>
-              </>
-            }
-          >
+          <Route path="/" element={<ProtectedRoute />}>
             <Route path="/" element={<Dashboard />} />
-
             <Route
               path="products"
               element={
@@ -57,6 +54,8 @@ const App = () => {
               <Route path="" element={<Products />} />
             </Route>
           </Route>
+
+          <Route path="/login" element={<LoginRoute />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

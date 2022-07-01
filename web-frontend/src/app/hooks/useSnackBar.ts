@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { openSnackBar } from "../slices/snackbarSlice";
+import { closeSnackBarState, openSnackBar } from "../slices/snackbarSlice";
 import { RootState } from "../store";
 
 export const useSnackBar = (
@@ -8,15 +8,17 @@ export const useSnackBar = (
   dependency: any[] = []
 ) => {
   const dispatch = useDispatch();
-  const { open, message } = useSelector((state: RootState) => state.snackbar);
+  const { open, message, error } = useSelector(
+    (state: RootState) => state.snackbar
+  );
 
-  const showSnackbar = (message: string) => {
-    dispatch(openSnackBar({ open: true, message }));
+  const handleClose = () => {
+    dispatch(closeSnackBarState());
   };
 
-  useEffect(() => {
-    showSnackbar(defaultMessage);
-  }, dependency);
+  const showSnackbar = (message: string, error: boolean = false) => {
+    dispatch(openSnackBar({ open: true, message, error }));
+  };
 
-  return { open, message, showSnackbar };
+  return { open, message, showSnackbar, error, handleClose };
 };

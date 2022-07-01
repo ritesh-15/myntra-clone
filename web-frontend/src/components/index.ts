@@ -6,6 +6,7 @@ import Table from "./table/Table";
 import Input from "./input/Input";
 import Textarea from "./textarea/Textarea";
 import SelectBox from "./select/Select";
+import LoadingScreen from "./loadingScreen/LoadingScreen";
 
 export {
   Navbar,
@@ -16,4 +17,5 @@ export {
   Input,
   Textarea,
   SelectBox,
+  LoadingScreen,
 };

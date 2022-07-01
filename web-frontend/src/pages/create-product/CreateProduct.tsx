@@ -1,5 +1,7 @@
 import { AddOutlined, DeleteOutline, Save } from "@mui/icons-material";
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ProductApi from "../../api/products";
 import { useSnackBar } from "../../app/hooks/useSnackBar";
 import { Button, Input, SelectBox, Textarea } from "../../components";
 import { useForm } from "../../hooks/useForm";
@@ -27,6 +29,11 @@ interface SizeInterface {
 const categories = ["Men", "Women"];
 
 const CreateProduct: FC = (): JSX.Element => {
+  // hooks
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackBar();
+
+  // states
   const [sizes, setSizes] = useState<SizeInterface[]>([
     {
       title: "",
@@ -39,31 +46,48 @@ const CreateProduct: FC = (): JSX.Element => {
 
   const [category, changeCategory] = useState<string>("");
 
-  const { showSnackbar } = useSnackBar();
-
   // submit form
-  const submitForm = (values: CreateProductForm) => {};
+  const submitForm = async (values: CreateProductForm) => {
+    const data = {
+      sizes,
+      category,
+      originalPrice: parseInt(values.originalPrice),
+      name: values.name,
+      fit: values.fit,
+      fabric: values.fabric,
+      description: values.description,
+    };
+
+    const formData = new FormData();
+
+    images.forEach((image) => {
+      formData.append("file", image);
+    });
+
+    formData.append("data", JSON.stringify(data));
+
+    try {
+      const response = await ProductApi.createProduct(formData);
+      showSnackbar(response.data.message);
+      navigate("/products", { replace: true });
+    } catch (error: any) {
+      showSnackbar("Something went wrong!", true);
+    }
+  };
 
   // form state
   const { errors, values, handleChange, handleSubmit } =
     useForm<CreateProductForm>(
       {
-        title: "",
+        name: "",
         description: "",
         fit: "",
         fabric: "",
-        stocks: "",
         originalPrice: "",
       },
       ProductValidation.validateCreateProduct,
       submitForm
     );
-
-  useEffect(() => {
-    if (Object(errors).keys !== 0) {
-      showSnackbar(errors);
-    }
-  }, [errors]);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     const data = sizes.map((size, i) => {
@@ -124,11 +148,11 @@ const CreateProduct: FC = (): JSX.Element => {
         <Row>
           <FieldHeading>Product Name</FieldHeading>
           <Input
-            name="title"
+            name="name"
             onChange={handleChange}
-            value={values.title}
+            value={values.name}
             title="Product Name"
-            error={errors.title}
+            error={errors.name}
           />
         </Row>
         <Row>

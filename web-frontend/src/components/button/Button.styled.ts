@@ -5,6 +5,7 @@ export const Wrapper = styled.div<{
   disabled?: boolean;
   outlined?: boolean;
   icon?: boolean;
+  fullWidth?: boolean;
 }>`
   button {
     border: none;
@@ -32,6 +33,8 @@ export const Wrapper = styled.div<{
         if (outlined) return theme.colors.primary;
         return "transparent";
       }};
+    width: ${({ fullWidth }) => (fullWidth ? "100%" : "fit-content")};
+    justify-content: ${({ fullWidth }) => (fullWidth ? "center" : "auto")};
 
     span {
       margin-left: ${({ icon }) => (icon ? "1em" : "0")};

@@ -4,17 +4,10 @@ class ProductValidation {
   static validateCreateProduct = (
     data: CreateProductForm
   ): CreateProductForm => {
-    const errors: CreateProductForm = {
-      title: "",
-      description: "",
-      stocks: "",
-      originalPrice: "",
-      fit: "",
-      fabric: "",
-    };
+    const errors: any = {};
 
-    if (!data.title) {
-      errors.title = "Product title not provided";
+    if (!data.name) {
+      errors.name = "Product title not provided";
     }
 
     if (!data.description) {

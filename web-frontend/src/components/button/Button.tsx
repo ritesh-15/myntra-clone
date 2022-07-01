@@ -11,6 +11,7 @@ interface ButtonProps
   disabled?: boolean;
   loading?: boolean;
   outlined?: boolean;
+  fullWidth?: boolean;
 }
 
 const Button: FC<ButtonProps> = ({
@@ -19,6 +20,7 @@ const Button: FC<ButtonProps> = ({
   disabled,
   loading,
   outlined,
+  fullWidth = false,
   ...props
 }): JSX.Element => {
   return (
@@ -27,6 +29,7 @@ const Button: FC<ButtonProps> = ({
       outlined={outlined}
       loading={loading}
       disabled={disabled}
+      fullWidth={fullWidth}
     >
       <button {...props}>
         {loading ? (

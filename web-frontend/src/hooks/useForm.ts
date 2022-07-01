@@ -6,7 +6,7 @@ export const useForm = <T>(
   callback: (values: T) => void
 ) => {
   const [values, setValues] = useState<T>(initialState);
-  const [errors, setErrors] = useState<T | any>({});
+  const [errors, setErrors] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleChange = (
@@ -28,5 +28,5 @@ export const useForm = <T>(
     }
   }, [errors]);
 
-  return { handleChange, values, handleSubmit, errors };
+  return { handleChange, values, handleSubmit, errors, isSubmitting };
 };
