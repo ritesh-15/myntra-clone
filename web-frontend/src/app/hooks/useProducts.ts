@@ -1,11 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { ProductInterface } from "../../interfaces/product/ProductInterface";
-import { setProductsState } from "../slices/productSlice";
+import {
+  setProductsState,
+  setProductInMapById,
+  getProductInMapById,
+} from "../slices/productSlice";
 import { RootState } from "../store";
 
 export const useProducts = () => {
   const dispatch = useDispatch();
-  const { products, isFetch } = useSelector(
+  const { products, isFetch, currentSetProduct } = useSelector(
     (state: RootState) => state.products
   );
 
@@ -13,5 +17,20 @@ export const useProducts = () => {
     dispatch(setProductsState(products));
   };
 
-  return { changeProductsState, products, isFetch };
+  const setProductInMap = (product: ProductInterface) => {
+    dispatch(setProductInMapById(product));
+  };
+
+  const getProductById = (id: string) => {
+    dispatch(getProductInMapById(id));
+  };
+
+  return {
+    changeProductsState,
+    products,
+    isFetch,
+    setProductInMap,
+    getProductById,
+    currentSetProduct,
+  };
 };

@@ -7,6 +7,7 @@ import Input from "./input/Input";
 import Textarea from "./textarea/Textarea";
 import SelectBox from "./select/Select";
 import LoadingScreen from "./loadingScreen/LoadingScreen";
+import Loader from "./data-loader/Loader";
 
 export {
   Navbar,
@@ -18,4 +19,5 @@ export {
   Textarea,
   SelectBox,
   LoadingScreen,
+  Loader,
 };

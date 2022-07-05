@@ -5,7 +5,13 @@ import { useSnackBar } from "./app/hooks/useSnackBar";
 import { LoadingScreen, Navbar, Sidebar } from "./components";
 import GlobalStyle from "./global/GlobalStyle";
 import { useRefresh } from "./hooks/useRefresh";
-import { CreateProduct, Dashboard, Login, Products } from "./pages";
+import {
+  CreateProduct,
+  Dashboard,
+  Login,
+  Products,
+  SingleProduct,
+} from "./pages";
 import LoginRoute from "./routes/LoginRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { DarkTheme } from "./theme/DarkTheme";
@@ -38,6 +44,7 @@ const App = () => {
           </Alert>
         </Snackbar>
       )}
+
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<ProtectedRoute />}>
@@ -52,6 +59,7 @@ const App = () => {
             >
               <Route path="create" element={<CreateProduct />} />
               <Route path="" element={<Products />} />
+              <Route path=":id" element={<SingleProduct />} />
             </Route>
           </Route>
 

@@ -3,7 +3,7 @@ export interface ProductInterface {
   description: string;
   originalPrice: number;
   discountPrice: number;
-  category: ProductCategory;
+  catagory: ProductCategory;
   fit: string;
   fabric: string;
   images: ProductImage[];
@@ -22,11 +22,10 @@ interface ProductCategory {
 }
 
 interface ProductSize {
-  name: string;
+  title: string;
   id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  productId: string | null;
+  description: string;
+  measurement: string;
 }
 
 interface ProductImage {
