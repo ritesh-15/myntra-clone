@@ -3,10 +3,12 @@ import { useProducts } from "../../app/hooks/useProducts";
 import { useSnackBar } from "../../app/hooks/useSnackBar";
 import ProductApi from "../../api/products";
 import {
+  LoaderWrapper,
   ProductsTopHeading,
   ProductsWrapper,
   ProductTopBarAction,
   ProductTopBarWrapper,
+  Refetch,
   SearchOutlinedIcon,
   SearchWrapper,
   Wrapper,
@@ -21,9 +23,10 @@ import {
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { Link } from "react-router-dom";
-import { Add } from "@mui/icons-material";
-import { Button } from "../../components";
+import { Add, RefreshOutlined } from "@mui/icons-material";
+import { Button, Loader } from "../../components";
 import moment from "moment";
+import { api } from "../../api/axios";
 
 const Products: FC = (): JSX.Element => {
   // hooks
@@ -33,22 +36,60 @@ const Products: FC = (): JSX.Element => {
   const { showSnackbar } = useSnackBar();
 
   // state
+  const [refetch, setRefetch] = useState(false);
+  const [search, setSearch] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isFetch) return;
+    if (!search) return;
 
+    const controller = new AbortController();
     (async () => {
       try {
-        const { data } = await ProductApi.getAllProducts();
+        const { data } = await api.get(`/product/all?query=${search}`, {
+          signal: controller.signal,
+        });
         changeProductsState(data.products);
       } catch (error: any) {
         showSnackbar(error.response.data.message, true);
       }
     })();
+
+    return () => {
+      controller.abort();
+    };
+  }, [search]);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const { data } = await ProductApi.getAllProducts();
+      changeProductsState(data.products);
+      setLoading(false);
+    } catch (error: any) {
+      setLoading(false);
+      showSnackbar(error.response.data.message, true);
+    }
+  };
+
+  useEffect(() => {
+    if (isFetch) return;
+
+    fetchProducts();
   }, [isFetch]);
+
+  if (loading)
+    return (
+      <LoaderWrapper>
+        <Loader />
+      </LoaderWrapper>
+    );
 
   return (
     <Wrapper>
+      <Refetch onClick={() => fetchProducts()}>
+        <RefreshOutlined />
+      </Refetch>
       <ProductTopBarWrapper>
         <ProductsTopHeading>
           <h5>Products Listed</h5>
@@ -56,7 +97,12 @@ const Products: FC = (): JSX.Element => {
         <ProductTopBarAction>
           <SearchWrapper>
             <SearchOutlinedIcon />
-            <input type="text" placeholder="Search" />
+            <input
+              onChange={(e) => setSearch(e.target.value)}
+              value={search}
+              type="text"
+              placeholder="Search"
+            />
           </SearchWrapper>
           <Link to={"create"}>
             <Button title="Add Product" icon={<Add />} />

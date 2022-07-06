@@ -1,4 +1,14 @@
+import { CSSProperties, FC } from "react";
 import styled from "styled-components";
+
+interface LoaderInterface {
+  style?: CSSProperties;
+}
+
+export const Wrapper = styled.div`
+  width: 100%;
+  height: 100%;
+`;
 
 const MainLoader = styled.div`
   width: 50px;
@@ -20,8 +30,8 @@ const MainLoader = styled.div`
   }
 `;
 
-const Loader = () => {
-  return <MainLoader>Loader</MainLoader>;
+const Loader: FC<LoaderInterface> = ({ style }) => {
+  return <MainLoader />;
 };
 
 export default Loader;

@@ -9,6 +9,7 @@ import {
   ProductBasicInfo,
   ProductImage,
   ProductImages,
+  Refetch,
   RemoveButton,
   Row,
   SizeTable,
@@ -16,7 +17,12 @@ import {
 } from "./SingleProduct.styled";
 import ProductApi from "../../api/products";
 import { useSnackBar } from "../../app/hooks/useSnackBar";
-import { AddOutlined, DeleteOutline, Save } from "@mui/icons-material";
+import {
+  AddOutlined,
+  DeleteOutline,
+  Save,
+  RefreshOutlined,
+} from "@mui/icons-material";
 
 interface SizeInterface {
   title: string;
@@ -30,6 +36,8 @@ const SingleProduct: FC = (): JSX.Element => {
   const { showSnackbar } = useSnackBar();
 
   //states
+  const [refetch, setRefetch] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [product, setProduct] = useState<ProductInterface | null>(null);
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
@@ -47,7 +55,7 @@ const SingleProduct: FC = (): JSX.Element => {
 
       setLoading(true);
       try {
-        const { data } = await ProductApi.getSingleProduct(id);
+        const { data } = await ProductApi.getSingleProduct(id, refetch);
         console.log(data);
         if (data.ok) {
           setProduct(data.product);
@@ -60,7 +68,21 @@ const SingleProduct: FC = (): JSX.Element => {
         setLoading(false);
       }
     })();
-  }, [id]);
+  }, [id, refetch]);
+
+  // handle product change
+  const handleProductChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (!product) return;
+
+    const { name, value } = e.target;
+
+    setProduct({
+      ...product,
+      [name]: value,
+    });
+  };
 
   // remove the image
   const removeFile = (index: number) => {
@@ -117,16 +139,95 @@ const SingleProduct: FC = (): JSX.Element => {
     setSizes(sizes.filter((data, i) => i != index));
   };
 
-  if (loading) return <Loader />;
+  // handle update
+  const handleUpdate = async () => {
+    if (!product) return;
+
+    setSubmitting(true);
+    if (images.length > 0) {
+      const formData = new FormData();
+      images.forEach((image) => {
+        formData.append("file", image);
+      });
+
+      try {
+        await ProductApi.updateProductImage(product?.id, formData);
+      } catch (error: any) {
+        showSnackbar(error.response.data.message, true);
+      }
+    }
+
+    try {
+      const { data } = await ProductApi.updateProduct(product.id, {
+        name: product.name,
+        description: product.description,
+        fabric: product.fabric,
+        fit: product.fit,
+        stock: product.stock,
+        discount: product.discount,
+        originalPrice: product.originalPrice,
+      });
+      setProduct(data.product);
+      setSubmitting(false);
+      showSnackbar("Product Updated Successfully!");
+    } catch (error: any) {
+      showSnackbar(error.response.data.message, true);
+      setSubmitting(false);
+    }
+  };
+
+  // delete product
+  const deleteProduct = async () => {
+    if (!product) return;
+
+    try {
+      await ProductApi.deleteProduct(product.id);
+      showSnackbar("Product deleted successfully");
+    } catch (error: any) {
+      showSnackbar(error.response.data.message, true);
+    }
+  };
+
+  // delete image
+  const deleteImage = async (id: string) => {
+    if (!product) return;
+
+    try {
+      await ProductApi.deleteProductImage(id);
+      showSnackbar("Images removed successfully!");
+      setProduct({
+        ...product,
+        images: product.images.filter((image) => image.publicId !== id),
+      });
+    } catch (error: any) {
+      showSnackbar(error.response.data.message, true);
+    }
+  };
+
+  if (loading)
+    return (
+      <Wrapper
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Loader style={{ height: "100%" }} />
+      </Wrapper>
+    );
 
   return (
     <Wrapper>
+      <Refetch onClick={() => setRefetch(true)}>
+        <RefreshOutlined />
+      </Refetch>
       <ProductImages>
         {product?.images.map((image) => {
           return (
             <ProductImage key={image.publicId}>
               <img src={image.url} alt="" />
-              <RemoveButton>
+              <RemoveButton onClick={() => deleteImage(image.publicId)}>
                 <DeleteOutline />
               </RemoveButton>
             </ProductImage>
@@ -161,7 +262,12 @@ const SingleProduct: FC = (): JSX.Element => {
         <Row>
           <Col>
             <h6>Product Name</h6>
-            <Input value={product?.name} title="Product Name" />
+            <Input
+              onChange={handleProductChange}
+              name="name"
+              value={product?.name}
+              title="Product Name"
+            />
           </Col>
           <Col>
             <h6>Product Category</h6>
@@ -170,29 +276,56 @@ const SingleProduct: FC = (): JSX.Element => {
 
           <Col>
             <h6>Price</h6>
-            <Input value={product?.originalPrice} title="Price" />
+            <Input
+              name="originalPrice"
+              value={product?.originalPrice}
+              title="Price"
+              onChange={handleProductChange}
+            />
           </Col>
           <Col>
             <h6>Discount</h6>
-            <Input value={product?.discount} title="Discount" />
+            <Input
+              onChange={handleProductChange}
+              name="discount"
+              value={product?.discount}
+              title="Discount"
+            />
           </Col>
           <Col>
             <h6>Fabric</h6>
-            <Input value={product?.fabric} title="Fabric" />
+            <Input
+              onChange={handleProductChange}
+              name="fabric"
+              value={product?.fabric}
+              title="Fabric"
+            />
           </Col>
           <Col>
             <h6>Fit</h6>
-            <Input value={product?.fit} title="Fit" />
+            <Input
+              onChange={handleProductChange}
+              name="fit"
+              value={product?.fit}
+              title="Fit"
+            />
           </Col>
           <Col>
             <h6>Stocks</h6>
-            <Input value={product?.stock} title="Stocks" />
+            <Input
+              onChange={handleProductChange}
+              name="stock"
+              value={product?.stock}
+              title="Stocks"
+            />
           </Col>
           <Col>
             <h6>Product Description</h6>
             <Textarea
               value={product?.description}
               title="Product Description"
+              name="description"
+              onChange={handleProductChange}
             />
           </Col>
         </Row>
@@ -261,13 +394,14 @@ const SingleProduct: FC = (): JSX.Element => {
       <Flex>
         <Button
           type="submit"
-          onClick={() => {}}
+          onClick={handleUpdate}
           title="Update"
+          loading={submitting}
           icon={<Save />}
         />
         <Button
           type="submit"
-          onClick={() => {}}
+          onClick={deleteProduct}
           title="Delete"
           icon={<DeleteOutline />}
           outlined

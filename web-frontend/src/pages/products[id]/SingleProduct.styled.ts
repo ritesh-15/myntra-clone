@@ -4,6 +4,8 @@ export const Wrapper = styled.div`
   padding: 1em;
   height: calc(100vh - 60px);
   overflow-y: auto;
+  position: relative;
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 export const ProductBasicInfo = styled.div`
@@ -132,5 +134,22 @@ export const SizeTable = styled.div`
 export const Flex = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+`;
+
+export const Refetch = styled.div`
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  z-index: 10;
+  cursor: pointer;
+  -webkit-box-shadow: -2px 7px 5px 0px ${({ theme }) => theme.colors.shadow};
+  -moz-box-shadow: -2px 7px 5px 0px ${({ theme }) => theme.colors.shadow};
+  box-shadow: -2px 7px 5px 0px ${({ theme }) => theme.colors.shadow};
 `;

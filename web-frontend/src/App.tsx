@@ -9,7 +9,9 @@ import {
   CreateProduct,
   Dashboard,
   Login,
+  Orders,
   Products,
+  SingleOrder,
   SingleProduct,
 } from "./pages";
 import LoginRoute from "./routes/LoginRoute";
@@ -38,7 +40,12 @@ const App = () => {
     <ThemeProvider theme={LightTheme}>
       <GlobalStyle />
       {open && (
-        <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+        <Snackbar
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+        >
           <Alert severity={error ? "error" : "success"} sx={{ width: "100%" }}>
             {message}
           </Alert>
@@ -60,6 +67,18 @@ const App = () => {
               <Route path="create" element={<CreateProduct />} />
               <Route path="" element={<Products />} />
               <Route path=":id" element={<SingleProduct />} />
+            </Route>
+
+            <Route
+              path="orders"
+              element={
+                <>
+                  <Outlet />
+                </>
+              }
+            >
+              <Route path="" element={<Orders />} />
+              <Route path=":id" element={<SingleOrder />} />
             </Route>
           </Route>
 

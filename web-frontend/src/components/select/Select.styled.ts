@@ -29,7 +29,7 @@ export const OptionsContainer = styled.div<OptionContainerProps>`
   right: 0;
   border-radius: 0.25em;
   z-index: 120;
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.cardBackground};
   margin-top: 0.5em;
   max-height: 300px;
   overflow-y: auto;
@@ -37,6 +37,7 @@ export const OptionsContainer = styled.div<OptionContainerProps>`
   transition: opacity 0.3s ease;
   opacity: ${({ active }) => (!active ? "0" : "1")};
   top: 0em;
+  color: ${({ theme }) => theme.colors.text};
 
   div {
     padding: 1em;

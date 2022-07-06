@@ -21,7 +21,7 @@ interface ProductCategory {
   updatedAt: Date;
 }
 
-interface ProductSize {
+export interface ProductSize {
   title: string;
   id: string;
   description: string;

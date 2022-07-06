@@ -13,7 +13,7 @@ export const LightTheme = {
     shadow: "hsl(0, 0%, 91%)",
     shadowDark: "hsl(0, 0%, 80%)",
     cardBackground: "hsl(0, 0%, 100%)",
-    disabled: "hsl(214, 6%, 66%)",
+    disabled: "hsl(214, 6%, 70%)",
     red: "hsl(8, 100%, 48%)",
   },
   fontSize: {

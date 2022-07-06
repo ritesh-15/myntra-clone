@@ -5,16 +5,18 @@ class ProductApi {
     return api.post("/product/create", data);
   }
 
-  static getAllProducts() {
-    return api.get("/product/all");
+  static getAllProducts(query?: string) {
+    return query
+      ? api.get(`/product/all?query=${query}`)
+      : api.get("/product/all");
   }
 
-  static getSingleProduct(id: string) {
-    return api.get(`/product/${id}`);
+  static getSingleProduct(id: string, refetch: boolean = false) {
+    return api.get(`/product/${id}?refetch=${refetch}`);
   }
 
   static deleteProductImage(id: string) {
-    return api.delete(`/product/images/${id}`);
+    return api.delete(`/product/images/delete?publicId=${id}`);
   }
 
   static updateProductImage(id: string, data: any) {

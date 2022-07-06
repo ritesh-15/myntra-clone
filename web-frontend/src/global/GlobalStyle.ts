@@ -8,7 +8,7 @@ const GlobalStyle = createGlobalStyle`
    
     }
 
-    h1 , h2 , h3 , h4 , h5 , h6, span, a , button, input, textarea, label{
+    h1 , h2 , h3 , h4 , h5 , h6, span, a , button, input, textarea, label,p{
         font-family: "Poppins", sans-serif;
         font-size: 1rem;
         font-weight: normal;

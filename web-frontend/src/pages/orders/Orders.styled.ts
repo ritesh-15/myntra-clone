@@ -1,4 +1,3 @@
-import { SearchOutlined } from "@mui/icons-material";
 import styled from "styled-components";
 
 export const Wrapper = styled.div`
@@ -10,11 +9,7 @@ export const Wrapper = styled.div`
   overflow-y: auto;
 `;
 
-export const ProductsWrapper = styled.div`
-  background: ${({ theme }) => theme.colors.cardBackground};
-`;
-
-export const ProductTopBarWrapper = styled.div`
+export const OrderTopBarWrapper = styled.div`
   margin-bottom: 2em;
   display: flex;
   flex-direction: column;
@@ -26,7 +21,7 @@ export const ProductTopBarWrapper = styled.div`
   }
 `;
 
-export const ProductsTopHeading = styled.div`
+export const OrdersTopHeading = styled.div`
   h5 {
     font-size: ${({ theme }) => theme.fontSize.h5};
     font-weight: 500;
@@ -51,11 +46,13 @@ export const SearchWrapper = styled.div`
   }
 `;
 
-export const ProductTopBarAction = styled.div`
+export const OrderTopBarAction = styled.div`
   display: flex;
 `;
 
-export const SearchOutlinedIcon = styled(SearchOutlined)``;
+export const OrdersWrapper = styled.div`
+  background: ${({ theme }) => theme.colors.cardBackground};
+`;
 
 export const Refetch = styled.div`
   position: fixed;
