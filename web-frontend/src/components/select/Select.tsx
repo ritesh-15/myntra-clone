@@ -5,7 +5,7 @@ import { MutableRefObject } from "react";
 
 interface SelectBoxProps {
   current: string;
-  changeCurrent(value: string): void;
+  changeCurrent(value: any): void;
   options: any[];
   label: string;
   search?: boolean;

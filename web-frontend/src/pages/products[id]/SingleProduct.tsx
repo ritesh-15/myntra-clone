@@ -1,7 +1,10 @@
 import { ChangeEvent, FC, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Input, Loader, Textarea } from "../../components";
-import { ProductInterface } from "../../interfaces/product/ProductInterface";
+import { Button, Input, Loader, SelectBox, Textarea } from "../../components";
+import {
+  ProductCategory,
+  ProductInterface,
+} from "../../interfaces/product/ProductInterface";
 import {
   AddImage,
   Col,
@@ -23,6 +26,7 @@ import {
   Save,
   RefreshOutlined,
 } from "@mui/icons-material";
+import { useProducts } from "../../app/hooks/useProducts";
 
 interface SizeInterface {
   title: string;
@@ -34,8 +38,11 @@ const SingleProduct: FC = (): JSX.Element => {
   // hooks
   const { id } = useParams();
   const { showSnackbar } = useSnackBar();
+  const { categories, products, changeProductsState } = useProducts();
+  const navigate = useNavigate();
 
   //states
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [refetch, setRefetch] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [product, setProduct] = useState<ProductInterface | null>(null);
@@ -48,6 +55,7 @@ const SingleProduct: FC = (): JSX.Element => {
       measurement: "",
     },
   ]);
+  const [category, changeCategory] = useState<string>("");
 
   useEffect(() => {
     (async () => {
@@ -56,14 +64,15 @@ const SingleProduct: FC = (): JSX.Element => {
       setLoading(true);
       try {
         const { data } = await ProductApi.getSingleProduct(id, refetch);
-        console.log(data);
         if (data.ok) {
           setProduct(data.product);
           setSizes(data.product.sizes);
+          changeCategory(data.product.catagory.name);
         }
         showSnackbar("Product fetched successfully");
         setLoading(false);
       } catch (error: any) {
+        console.log(error);
         showSnackbar(error.response.data.message, true);
         setLoading(false);
       }
@@ -143,6 +152,10 @@ const SingleProduct: FC = (): JSX.Element => {
   const handleUpdate = async () => {
     if (!product) return;
 
+    const choosenCategory: ProductCategory | undefined = categories.find(
+      (it) => it.name === category
+    );
+
     setSubmitting(true);
     if (images.length > 0) {
       const formData = new FormData();
@@ -166,7 +179,9 @@ const SingleProduct: FC = (): JSX.Element => {
         stock: product.stock,
         discount: product.discount,
         originalPrice: product.originalPrice,
+        categoryId: choosenCategory?.id,
       });
+
       setProduct(data.product);
       setSubmitting(false);
       showSnackbar("Product Updated Successfully!");
@@ -180,18 +195,24 @@ const SingleProduct: FC = (): JSX.Element => {
   const deleteProduct = async () => {
     if (!product) return;
 
+    setDeleteLoading(true);
+
     try {
       await ProductApi.deleteProduct(product.id);
       showSnackbar("Product deleted successfully");
+      changeProductsState(products.filter((it) => it.id !== product.id));
+      setDeleteLoading(false);
     } catch (error: any) {
+      navigate("/products");
       showSnackbar(error.response.data.message, true);
+      setDeleteLoading(false);
     }
   };
 
   // delete image
   const deleteImage = async (id: string) => {
     if (!product) return;
-
+    setLoading(true);
     try {
       await ProductApi.deleteProductImage(id);
       showSnackbar("Images removed successfully!");
@@ -199,7 +220,9 @@ const SingleProduct: FC = (): JSX.Element => {
         ...product,
         images: product.images.filter((image) => image.publicId !== id),
       });
+      setLoading(false);
     } catch (error: any) {
+      setLoading(false);
       showSnackbar(error.response.data.message, true);
     }
   };
@@ -271,7 +294,12 @@ const SingleProduct: FC = (): JSX.Element => {
           </Col>
           <Col>
             <h6>Product Category</h6>
-            <Input value={product?.catagory?.name} title="Product Category" />
+            <SelectBox
+              options={categories.map((category) => category.name)}
+              current={category}
+              changeCurrent={(value) => changeCategory(value)}
+              label="Choose Category"
+            />
           </Col>
 
           <Col>
@@ -283,6 +311,7 @@ const SingleProduct: FC = (): JSX.Element => {
               onChange={handleProductChange}
             />
           </Col>
+
           <Col>
             <h6>Discount</h6>
             <Input
@@ -292,6 +321,12 @@ const SingleProduct: FC = (): JSX.Element => {
               title="Discount"
             />
           </Col>
+
+          <Col>
+            <h6>Discount Price</h6>
+            <p>{product?.discountPrice}</p>
+          </Col>
+
           <Col>
             <h6>Fabric</h6>
             <Input
@@ -301,6 +336,7 @@ const SingleProduct: FC = (): JSX.Element => {
               title="Fabric"
             />
           </Col>
+
           <Col>
             <h6>Fit</h6>
             <Input
@@ -405,6 +441,7 @@ const SingleProduct: FC = (): JSX.Element => {
           title="Delete"
           icon={<DeleteOutline />}
           outlined
+          loading={deleteLoading}
         />
       </Flex>
     </Wrapper>

@@ -2,10 +2,12 @@ import { AddOutlined, DeleteOutline, Save } from "@mui/icons-material";
 import { ChangeEvent, FC, FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductApi from "../../api/products";
+import { useProducts } from "../../app/hooks/useProducts";
 import { useSnackBar } from "../../app/hooks/useSnackBar";
 import { Button, Input, SelectBox, Textarea } from "../../components";
 import { useForm } from "../../hooks/useForm";
 import { CreateProductForm } from "../../interfaces/product/CreateProductInterface";
+import { ProductCategory } from "../../interfaces/product/ProductInterface";
 import ProductValidation from "../../validations/ProductValidation";
 import {
   FieldHeading,
@@ -26,12 +28,11 @@ interface SizeInterface {
   measurement: string;
 }
 
-const categories = ["Men", "Women"];
-
 const CreateProduct: FC = (): JSX.Element => {
   // hooks
   const navigate = useNavigate();
   const { showSnackbar } = useSnackBar();
+  const { categories } = useProducts();
 
   // states
   const [sizes, setSizes] = useState<SizeInterface[]>([
@@ -48,9 +49,13 @@ const CreateProduct: FC = (): JSX.Element => {
 
   // submit form
   const submitForm = async (values: CreateProductForm) => {
+    const choosenCategory: ProductCategory | undefined = categories.find(
+      (it) => it.name === category
+    );
+
     const data = {
       sizes,
-      category,
+      categoryId: choosenCategory?.id,
       originalPrice: parseInt(values.originalPrice),
       name: values.name,
       fit: values.fit,
@@ -201,10 +206,10 @@ const CreateProduct: FC = (): JSX.Element => {
           <FieldHeading>Category</FieldHeading>
 
           <SelectBox
-            options={categories}
+            options={categories.map((category) => category.name)}
             current={category}
             changeCurrent={(value) => changeCategory(value)}
-            label="choose category"
+            label="Choose Category"
           />
         </Row>
 

@@ -14,7 +14,7 @@ const Main = styled.main`
 const ProtectedRoute = () => {
   const { user } = useUser();
 
-  if (!user) return <Navigate to={"/login"} replace />;
+  if (!user || !user.isAdmin) return <Navigate to={"/login"} replace />;
 
   return (
     <>

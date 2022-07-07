@@ -1,11 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ProductInterface } from "../../interfaces/product/ProductInterface";
+import {
+  ProductCategory,
+  ProductInterface,
+} from "../../interfaces/product/ProductInterface";
 
 interface ProductState {
   products: ProductInterface[];
   isFetch: boolean;
   productsMap: { [key: string]: ProductInterface };
   currentSetProduct: ProductInterface | null;
+  categories: ProductCategory[];
+  isCategoriesFetched: boolean;
 }
 
 const initialState: ProductState = {
@@ -13,6 +18,8 @@ const initialState: ProductState = {
   isFetch: false,
   productsMap: {},
   currentSetProduct: null,
+  categories: [],
+  isCategoriesFetched: false,
 };
 
 const productSlice = createSlice({
@@ -29,10 +36,17 @@ const productSlice = createSlice({
     getProductInMapById: (state, action: PayloadAction<string>) => {
       state.currentSetProduct = state.productsMap[action.payload];
     },
+    setProductCategories: (state, action: PayloadAction<ProductCategory[]>) => {
+      state.categories = action.payload;
+    },
   },
 });
 
-export const { setProductsState, setProductInMapById, getProductInMapById } =
-  productSlice.actions;
+export const {
+  setProductsState,
+  setProductInMapById,
+  getProductInMapById,
+  setProductCategories,
+} = productSlice.actions;
 
 export default productSlice.reducer;

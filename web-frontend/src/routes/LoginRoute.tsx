@@ -5,7 +5,7 @@ import { Login } from "../pages";
 const LoginRoute = () => {
   const { user } = useUser();
 
-  if (user) return <Navigate to={"/"} replace />;
+  if (user && user.isAdmin) return <Navigate to={"/"} replace />;
 
   return <Login />;
 };

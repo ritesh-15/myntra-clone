@@ -14,7 +14,7 @@ export interface ProductInterface {
   createdAt: string;
 }
 
-interface ProductCategory {
+export interface ProductCategory {
   name: string;
   id: string;
   createdAt: Date;

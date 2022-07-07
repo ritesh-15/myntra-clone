@@ -21,13 +21,23 @@ export const ProductBasicInfo = styled.div`
 
 export const Row = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 1em;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 2em;
 `;
 
 export const Col = styled.div`
   h6 {
     margin-bottom: 0.5em;
+  }
+  p {
+    background: ${({ theme }) => theme.colors.hoverLight};
+    padding: 0.5em;
+    color: ${({ theme }) => theme.colors.text};
+    border-radius: 0.25em;
+    height: 55px;
+    vertical-align: center;
+    display: flex;
+    align-items: center;
   }
 `;
 

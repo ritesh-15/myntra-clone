@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import {
   NavLinkStyle,
   SidebarItemsList,
@@ -17,9 +17,33 @@ import {
   Person,
   Logout,
   Settings,
+  CategoryOutlined,
 } from "@mui/icons-material";
+import { useSnackBar } from "../../app/hooks/useSnackBar";
+import UserApi from "../../api/user";
+import Loader from "../data-loader/Loader";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../../app/hooks/useUser";
 
 const Sidebar: FC = (): JSX.Element => {
+  const { showSnackbar } = useSnackBar();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { removeUserData } = useUser();
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      await UserApi.logout();
+      showSnackbar("Logout successful");
+      setLoading(false);
+      removeUserData();
+    } catch (error: any) {
+      setLoading(false);
+      showSnackbar(error.response.data.message, true);
+    }
+  };
+
   return (
     <Wrapper>
       <Title>Main Menu</Title>
@@ -50,9 +74,15 @@ const Sidebar: FC = (): JSX.Element => {
           </NavLinkStyle>
         </li>
         <li>
-          <NavLinkStyle to={"/customers"}>
+          <NavLinkStyle to={"/users"}>
             <Group />
             <span>Users</span>
+          </NavLinkStyle>
+        </li>
+        <li>
+          <NavLinkStyle to={"/categories"}>
+            <CategoryOutlined />
+            <span>Categories</span>
           </NavLinkStyle>
         </li>
       </SidebarItemsList>
@@ -110,10 +140,14 @@ const Sidebar: FC = (): JSX.Element => {
           </NavLinkStyle>
         </li>
         <li>
-          <NavLinkStyle to={"/logout"}>
-            <Logout />
-            <span>Log out</span>
-          </NavLinkStyle>
+          {loading ? (
+            <Loader />
+          ) : (
+            <NavLinkStyle to={"/login"} onClick={logout}>
+              <Logout />
+              <span>Log out</span>
+            </NavLinkStyle>
+          )}
         </li>
       </SidebarItemsList>
     </Wrapper>

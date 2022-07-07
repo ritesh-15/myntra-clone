@@ -38,6 +38,24 @@ class ProductApi {
   static deleteSize(id: string) {
     return api.delete(`/product/size/${id}`);
   }
+
+  static getAllCategories(query?: string) {
+    return query
+      ? api.get(`/product/category/all?query=${query}`)
+      : api.get("/product/category/all");
+  }
+
+  static getSingleCategory(id: string, refetch: boolean = false) {
+    return api.get(`/product/category/${id}?refetch=${refetch}`);
+  }
+
+  static updateCategory(id: string) {
+    return api.put("/product/category/:id");
+  }
+
+  static createCategory(data: any) {
+    return api.post("/product/category/create", data);
+  }
 }
 
 export default ProductApi;

@@ -1,11 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { UserInterface } from "../../interfaces/UserInterface";
-import { removeUser, setUser } from "../slices/userSlice";
+import { removeUser, setUser, setUsers } from "../slices/userSlice";
 import { RootState } from "../store";
 
 export const useUser = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, users, isFetch } = useSelector(
+    (state: RootState) => state.user
+  );
 
   const setUserData = (user: UserInterface) => {
     dispatch(setUser(user));
@@ -15,5 +17,16 @@ export const useUser = () => {
     dispatch(removeUser());
   };
 
-  return { setUserData, user, removeUserData };
+  const changeUsersState = (users: UserInterface[]) => {
+    dispatch(setUsers(users));
+  };
+
+  return {
+    setUserData,
+    user,
+    removeUserData,
+    changeUsersState,
+    users,
+    isFetch,
+  };
 };

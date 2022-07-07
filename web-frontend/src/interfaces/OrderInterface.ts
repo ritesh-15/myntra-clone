@@ -44,7 +44,7 @@ interface Payment {
   updatedAt: Date;
 }
 
-interface Address {
+export interface Address {
   id: string;
   address: string;
   city: string;

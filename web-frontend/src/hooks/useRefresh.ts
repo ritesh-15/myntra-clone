@@ -18,7 +18,7 @@ export const useRefresh = () => {
         setLoading(false);
       } catch (error: any) {
         setLoading(false);
-        showSnackbar(error.response.data.message);
+        showSnackbar(error.response.data.message, true);
       }
     })();
   }, []);

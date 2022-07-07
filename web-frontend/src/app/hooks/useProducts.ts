@@ -1,17 +1,25 @@
 import { useDispatch, useSelector } from "react-redux";
-import { ProductInterface } from "../../interfaces/product/ProductInterface";
+import {
+  ProductCategory,
+  ProductInterface,
+} from "../../interfaces/product/ProductInterface";
 import {
   setProductsState,
   setProductInMapById,
   getProductInMapById,
+  setProductCategories,
 } from "../slices/productSlice";
 import { RootState } from "../store";
 
 export const useProducts = () => {
   const dispatch = useDispatch();
-  const { products, isFetch, currentSetProduct } = useSelector(
-    (state: RootState) => state.products
-  );
+  const {
+    products,
+    isFetch,
+    currentSetProduct,
+    categories,
+    isCategoriesFetched,
+  } = useSelector((state: RootState) => state.products);
 
   const changeProductsState = (products: ProductInterface[]) => {
     dispatch(setProductsState(products));
@@ -25,6 +33,10 @@ export const useProducts = () => {
     dispatch(getProductInMapById(id));
   };
 
+  const changeCategoriesState = (categories: ProductCategory[]) => {
+    dispatch(setProductCategories(categories));
+  };
+
   return {
     changeProductsState,
     products,
@@ -32,5 +44,8 @@ export const useProducts = () => {
     setProductInMap,
     getProductById,
     currentSetProduct,
+    changeCategoriesState,
+    categories,
+    isCategoriesFetched,
   };
 };
