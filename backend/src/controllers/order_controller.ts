@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import HttpError from "../helper/error_handler";
 import { UserInterface } from "../interfaces/UserInterface";
 import PrismaClientProvider from "../providers/provide_prism_client";
+import RedisProvider from "../providers/redis_client";
 import { createOrderSchema } from "../validation/order";
 
 interface CreateOrder {
@@ -106,10 +107,42 @@ class OrderController {
   // @access Private Admin
 
   public async getAllOrders(req: Request, res: Response, next: NextFunction) {
+    const { query } = req.query;
+
+    const find = query
+      ? [
+          {
+            id: {
+              contains: query.toString(),
+            },
+          },
+          {
+            userId: {
+              contains: query.toString(),
+            },
+          },
+          {
+            addressId: {
+              contains: query.toString(),
+            },
+          },
+        ]
+      : undefined;
+
     try {
       const orders = await PrismaClientProvider.get().order.findMany({
+        where: {
+          OR: find,
+        },
         include: {
-          user: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
           products: {
             include: {
               product: true,
@@ -128,6 +161,7 @@ class OrderController {
         orders,
       });
     } catch (error) {
+      console.log(error);
       return next(HttpError.internalServerError("Internal server error"));
     }
   }
@@ -203,6 +237,14 @@ class OrderController {
               size: true,
             },
           },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
         },
         data: {
           extra: {
@@ -212,6 +254,10 @@ class OrderController {
           },
         },
       });
+
+      await RedisProvider.getInstance().del(order.id);
+
+      await RedisProvider.getInstance().set(order.id, JSON.stringify(order));
 
       return res.status(200).json({
         message: "Order updated successfully",
@@ -233,6 +279,16 @@ class OrderController {
     if (!id) return next(HttpError.notFound("Id not found"));
 
     try {
+      const cached = await RedisProvider.getInstance().get(id);
+
+      if (cached) {
+        return res.status(200).json({
+          message: "Order fetched successfully",
+          ok: true,
+          order: JSON.parse(cached),
+        });
+      }
+
       const foundOrder = await PrismaClientProvider.get().order.findUnique({
         where: {
           id,
@@ -247,10 +303,23 @@ class OrderController {
               size: true,
             },
           },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
         },
       });
 
       if (!foundOrder) return next(HttpError.notFound("Order not found"));
+
+      await RedisProvider.getInstance().set(
+        foundOrder.id,
+        JSON.stringify(foundOrder)
+      );
 
       return res.status(200).json({
         message: "Order fetched successfully",
@@ -258,6 +327,51 @@ class OrderController {
         order: foundOrder,
       });
     } catch (error) {
+      return next(HttpError.internalServerError("Internal server error"));
+    }
+  }
+
+  // @route GET /api/order/transactions
+  // @desc Get transaction
+  // @access Private Admin
+
+  public async getTransactions(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const transactions = await PrismaClientProvider.get().payment.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 5,
+      });
+
+      return res.json({
+        ok: true,
+        message: "Transactions fetched successfully",
+        transactions,
+      });
+    } catch (error: any) {
+      return next(HttpError.internalServerError("Internal server error"));
+    }
+  }
+
+  // @route GET /api/order/stats
+  // @desc Get stats
+  // @access Private Admin
+
+  public async getStats(req: Request, res: Response, next: NextFunction) {
+    try {
+      const stats = await PrismaClientProvider.get().order.aggregate({});
+
+      return res.json({
+        ok: true,
+        message: "Stats fetched successfully",
+        stats,
+      });
+    } catch (error: any) {
       return next(HttpError.internalServerError("Internal server error"));
     }
   }

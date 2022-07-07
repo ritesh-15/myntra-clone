@@ -21,6 +21,10 @@ router
 router.route("/product/category/all").get(productController.getAllCategories);
 
 router
+  .route("/product/category/create")
+  .post([authenticate, isAdmin], productController.createCategory);
+
+router
   .route("/product/category/:id")
   .put([authenticate, isAdmin], productController.updateCategory)
   .get(productController.getSingleCategory);

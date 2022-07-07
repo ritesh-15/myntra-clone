@@ -335,6 +335,15 @@ class AuthController {
       // set token in redis
       await RedisProvider.getInstance().set(data.id, refreshToken);
 
+      // get user details
+      const user = await PrismaClientProvider.get().user.findUnique({
+        where: {
+          id: data.id,
+        },
+      });
+
+      if (user == null) return next(HttpError.notFound("User not found!"));
+
       // set cookies
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -352,6 +361,7 @@ class AuthController {
           refreshToken,
         },
         ok: true,
+        user: new UserDto(user),
       });
     } catch (error) {
       return next(HttpError.unauthorized("Token not found!"));

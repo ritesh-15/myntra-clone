@@ -50,6 +50,67 @@ class UserController {
     }
   }
 
+  // @route  PUT /api/user/makeAdmin/:id
+  // @desc   Make Admin
+  // @access Private Admin
+
+  public async makeAdmin(req: Request, res: Response, next: NextFunction) {
+    const { id } = req.params;
+    const { isAdmin } = req.body;
+
+    if (!id) {
+      return next(HttpError.unporcessableEntity("Id is required"));
+    }
+
+    try {
+      // find user in db
+      const user = await PrismaClientProvider.get().user.findUnique({
+        where: { id },
+      });
+
+      if (!user) return next(HttpError.notFound("User not found"));
+
+      // update user
+      const updatedUser = await PrismaClientProvider.get().user.update({
+        where: { id },
+        data: {
+          isAdmin: isAdmin,
+        },
+        include: {
+          addresses: true,
+          orders: true,
+        },
+      });
+
+      await RedisProvider.getInstance().del(`user-${id}`);
+
+      const sendUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        isAdmin: updatedUser.isAdmin,
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        address: updatedUser.addresses,
+        orders: updatedUser.orders,
+      };
+
+      await RedisProvider.getInstance().set(
+        `user-${id}`,
+        JSON.stringify(sendUser)
+      );
+
+      return res.status(200).json({
+        ok: true,
+        message: "User updated successfully",
+        user: sendUser,
+      });
+    } catch (error) {
+      return next(HttpError.internalServerError("Internal Server Error"));
+    }
+  }
+
   // @route  GET /api/user/:id
   // @desc   Get single user
   // @access Private
@@ -76,14 +137,9 @@ class UserController {
       // find in db
       const user = await PrismaClientProvider.get().user.findUnique({
         where: { id },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phoneNumber: true,
-          isAdmin: true,
-          isVerified: true,
-          isActive: true,
+        include: {
+          addresses: true,
+          orders: true,
         },
       });
 
@@ -91,13 +147,28 @@ class UserController {
         return next(HttpError.notFound("User not found"));
       }
 
+      const sendUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        isAdmin: user.isAdmin,
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        address: user.addresses,
+        orders: user.orders,
+      };
+
       // save in cache
-      await RedisProvider.getInstance().set(`user-${id}`, JSON.stringify(user));
+      await RedisProvider.getInstance().set(
+        `user-${id}`,
+        JSON.stringify(sendUser)
+      );
 
       return res.status(200).json({
         ok: true,
         message: "User fetched successfully",
-        user,
+        user: sendUser,
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal Server Error"));
@@ -140,12 +211,35 @@ class UserController {
           name,
           phoneNumber: phoneNumber.toString(),
         },
+        include: {
+          addresses: true,
+          orders: true,
+        },
       });
+
+      const sendUser = {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phoneNumber: updatedUser.phoneNumber,
+        isAdmin: updatedUser.isAdmin,
+        isVerified: updatedUser.isVerified,
+        isActive: updatedUser.isActive,
+        address: updatedUser.addresses,
+        orders: updatedUser.orders,
+      };
+
+      await RedisProvider.getInstance().del(`user-${id}`);
+
+      await RedisProvider.getInstance().set(
+        `user-${id}`,
+        JSON.stringify(sendUser)
+      );
 
       return res.status(200).json({
         ok: true,
         message: "User updated successfully",
-        user: new UserDto(updatedUser),
+        user: sendUser,
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal Server Error"));
@@ -190,8 +284,6 @@ class UserController {
         address: newAddress,
       });
     } catch (error) {
-      console.log(error);
-
       return next(HttpError.internalServerError("Internal Server Error"));
     }
   }

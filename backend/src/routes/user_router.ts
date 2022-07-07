@@ -15,6 +15,10 @@ router
   .put([authenticate], userController.updateUser);
 
 router
+  .route("/user/makeAdmin/:id")
+  .put([authenticate, isAdmin], userController.makeAdmin);
+
+router
   .route("/user/address/all")
   .get(authenticate, userController.getAllAddress);
 

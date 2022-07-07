@@ -15,7 +15,7 @@ interface CreateProductBody {
   name: string;
   description: string;
   originalPrice: number;
-  catagory: string;
+  categoryId: string;
   fit: string;
   fabric: string;
   sizes: ProductSize[];
@@ -29,6 +29,7 @@ interface UpdateProduct {
   fabric: string;
   discount: number;
   stock: number;
+  categoryId: string;
 }
 
 interface ProductSize {
@@ -46,7 +47,7 @@ class ProductController {
     if (!req.body.data)
       return next(HttpError.unporcessableEntity("Data not found!"));
 
-    const { name, fit, fabric, sizes, catagory, description, originalPrice } =
+    const { name, fit, fabric, sizes, categoryId, description, originalPrice } =
       JSON.parse(req.body.data) as CreateProductBody;
 
     try {
@@ -59,22 +60,6 @@ class ProductController {
       return next(HttpError.unporcessableEntity("No files uploaded"));
 
     try {
-      // find the catagory
-      let catagoryData = await PrismaClientProvider.get().catagory.findUnique({
-        where: {
-          name: catagory,
-        },
-      });
-
-      if (catagoryData == null) {
-        // create new catagory
-        catagoryData = await PrismaClientProvider.get().catagory.create({
-          data: {
-            name: catagory,
-          },
-        });
-      }
-
       // create product
       const product = await PrismaClientProvider.get().product.create({
         data: {
@@ -83,12 +68,11 @@ class ProductController {
           originalPrice,
           fit,
           fabric,
-          catagoryId: catagoryData.id,
+          catagoryId: categoryId,
         },
       });
 
       // create the sizes
-
       sizes.map(async (size) => {
         await PrismaClientProvider.get().size.create({
           data: {
@@ -130,8 +114,35 @@ class ProductController {
   // @access Public
 
   public async getAllProducts(req: Request, res: Response, next: NextFunction) {
+    const { query } = req.query;
+
+    let find: any = null;
+    if (query) {
+      const search = query.toString();
+      find = [
+        {
+          name: {
+            contains: search,
+          },
+        },
+        {
+          description: {
+            contains: search,
+          },
+        },
+        {
+          catagoryId: {
+            contains: search,
+          },
+        },
+      ];
+    }
+
     try {
       const products = await PrismaClientProvider.get().product.findMany({
+        where: {
+          OR: find ? find : undefined,
+        },
         include: {
           images: {
             select: {
@@ -163,7 +174,6 @@ class ProductController {
       });
     } catch (error) {
       console.log(error);
-
       return next(HttpError.internalServerError("Internal Server Error"));
     }
   }
@@ -178,13 +188,15 @@ class ProductController {
     next: NextFunction
   ) {
     const { id } = req.params;
+    const { refetch } = req.query;
 
     if (!id) return next(HttpError.unporcessableEntity("Id not found!"));
 
     try {
       // find product in cache
       const foundInCache = await RedisProvider.getInstance().get(id);
-      if (foundInCache) {
+
+      if (foundInCache && refetch === "false") {
         return res.status(200).json({
           ok: true,
           message: "Product fetched successfully",
@@ -258,8 +270,16 @@ class ProductController {
       return next(HttpError.unporcessableEntity("Invalid data"));
     }
 
-    const { name, fit, fabric, description, originalPrice, discount, stock } =
-      data;
+    const {
+      name,
+      fit,
+      fabric,
+      description,
+      originalPrice,
+      discount,
+      stock,
+      categoryId,
+    } = data;
 
     try {
       const product = await PrismaClientProvider.get().product.findUnique({
@@ -275,6 +295,7 @@ class ProductController {
 
       if (discount && discount != 0) {
         discountPrice =
+          (originalPrice || product.originalPrice) -
           ((originalPrice || product.originalPrice) * discount) / 100;
       }
 
@@ -291,6 +312,7 @@ class ProductController {
           discount,
           discountPrice: parseInt(discountPrice.toString()),
           stock,
+          catagoryId: categoryId,
         },
         include: {
           sizes: {
@@ -316,18 +338,21 @@ class ProductController {
         },
       });
 
+      await RedisProvider.getInstance().del(id);
+
+      await RedisProvider.getInstance().set(id, JSON.stringify(updatedProduct));
+
       return res.status(200).json({
         ok: true,
         message: "Product updated successfully",
         product: updatedProduct,
       });
     } catch (error) {
-      console.log(error);
       return next(HttpError.internalServerError("Internal Server Error"));
     }
   }
 
-  // @route  DELETE /api/product/images/:id
+  // @route  DELETE /api/product/images/delete
   // @desc   Delete product image
   // @access Private Admin
 
@@ -479,8 +504,6 @@ class ProductController {
         message: "Product deleted successfully",
       });
     } catch (error) {
-      console.log(error);
-
       return next(HttpError.internalServerError("Internal Server Error"));
     }
   }
@@ -525,6 +548,42 @@ class ProductController {
     }
   }
 
+  // @route  POST /api/product/category/create
+  // @desc   Create category
+  // @access Private Admin
+
+  public async createCategory(req: Request, res: Response, next: NextFunction) {
+    const { name } = req.body;
+
+    if (!name) return next(HttpError.unporcessableEntity("Name not found!"));
+
+    try {
+      const isExists = await PrismaClientProvider.get().catagory.findUnique({
+        where: {
+          name,
+        },
+      });
+
+      if (isExists) {
+        return next(HttpError.unporcessableEntity("Category already exists!"));
+      }
+
+      const category = await PrismaClientProvider.get().catagory.create({
+        data: {
+          name,
+        },
+      });
+
+      return res.status(200).json({
+        ok: true,
+        message: "Category created successfully",
+        category,
+      });
+    } catch (error) {
+      return next(HttpError.unporcessableEntity("Invalid data"));
+    }
+  }
+
   // @route  GET /api/product/category/all
   // @desc   Get all categories
   // @access Public
@@ -535,29 +594,13 @@ class ProductController {
     next: NextFunction
   ) {
     try {
-      // find categories in cache
-      const foundCategories = await RedisProvider.getInstance().get(CATEGORIES);
-
-      if (foundCategories) {
-        return res.status(200).json({
-          ok: true,
-          categories: JSON.parse(foundCategories),
-          message: "Categories fetched successfully",
-        });
-      }
-
       const categories = await PrismaClientProvider.get().catagory.findMany({
         select: {
           id: true,
           name: true,
+          createdAt: true,
         },
       });
-
-      // save categories in cache
-      await RedisProvider.getInstance().set(
-        CATEGORIES,
-        JSON.stringify(categories)
-      );
 
       return res.status(200).json({
         ok: true,
@@ -579,6 +622,7 @@ class ProductController {
     next: NextFunction
   ) {
     const { id } = req.params;
+    const { refetch } = req.query;
 
     if (!id) return next(HttpError.unporcessableEntity("Id not found!"));
 
@@ -586,7 +630,7 @@ class ProductController {
       // find in cache
       const foundCategory = await RedisProvider.getInstance().get(id);
 
-      if (foundCategory) {
+      if (foundCategory && refetch === "false") {
         return res.status(200).json({
           ok: true,
           category: JSON.parse(foundCategory),

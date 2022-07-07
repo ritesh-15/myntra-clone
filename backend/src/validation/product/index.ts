@@ -4,7 +4,7 @@ export const productSchema = Joi.object().keys({
   name: Joi.string().required(),
   description: Joi.string().required(),
   originalPrice: Joi.number().required(),
-  catagory: Joi.string().required(),
+  categoryId: Joi.string().required(),
   fit: Joi.string().required(),
   fabric: Joi.string().required(),
   sizes: Joi.array().items(
@@ -24,6 +24,7 @@ export const updateProductSchema = Joi.object().keys({
   discount: Joi.number(),
   originalPrice: Joi.number(),
   stock: Joi.number(),
+  categoryId: Joi.string().required(),
 });
 
 export const updateSizeSchema = Joi.object().keys({
