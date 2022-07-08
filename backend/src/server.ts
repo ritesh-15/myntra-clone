@@ -12,10 +12,18 @@ import { productRouter } from "./routes/products_routes";
 import { userRouter } from "./routes/user_router";
 import RedisProvider from "./providers/redis_client";
 import { orderRouter } from "./routes/order_routes";
+import PrismaClientProvider from "./providers/provide_prism_client";
 
 const app: Application = express();
 
 const PORT = process.env.PORT || 9000;
+
+PrismaClientProvider.get()
+  .$connect()
+  .then(() => {
+    console.log("Database connected!");
+  })
+  .catch((error) => console.log(error));
 
 // redis connection
 const client = RedisProvider.getInstance();

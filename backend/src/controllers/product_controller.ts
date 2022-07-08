@@ -10,6 +10,7 @@ import {
 } from "../validation/product";
 import RedisProvider from "../providers/redis_client";
 import { CATEGORIES } from "../constants";
+import { pagination } from "../helper/pagination";
 
 interface CreateProductBody {
   name: string;
@@ -114,7 +115,13 @@ class ProductController {
   // @access Public
 
   public async getAllProducts(req: Request, res: Response, next: NextFunction) {
-    const { query } = req.query;
+    const { query, page, size } = req.query;
+
+    const { skip, limit, result } = pagination(
+      page,
+      size,
+      await PrismaClientProvider.get().product.count()
+    );
 
     let find: any = null;
     if (query) {
@@ -165,12 +172,15 @@ class ProductController {
             },
           },
         },
+        skip: skip,
+        take: limit,
       });
 
       return res.status(200).json({
         ok: true,
         message: "Products fetched successfully",
         products,
+        result,
       });
     } catch (error) {
       console.log(error);
@@ -593,6 +603,14 @@ class ProductController {
     res: Response,
     next: NextFunction
   ) {
+    const { page, size } = req.query;
+
+    const { skip, limit, result } = pagination(
+      page,
+      size,
+      await PrismaClientProvider.get().catagory.count()
+    );
+
     try {
       const categories = await PrismaClientProvider.get().catagory.findMany({
         select: {
@@ -600,12 +618,15 @@ class ProductController {
           name: true,
           createdAt: true,
         },
+        skip,
+        take: limit,
       });
 
       return res.status(200).json({
         ok: true,
         message: "Categories fetched successfully",
         categories,
+        result,
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal Server Error"));

@@ -28,8 +28,7 @@ import { useUser } from "../../app/hooks/useUser";
 const Sidebar: FC = (): JSX.Element => {
   const { showSnackbar } = useSnackBar();
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { removeUserData } = useUser();
+  const { removeUserData, user } = useUser();
 
   const logout = async () => {
     setLoading(true);
@@ -134,7 +133,7 @@ const Sidebar: FC = (): JSX.Element => {
 
       <SidebarItemsList>
         <li>
-          <NavLinkStyle to={"/account"}>
+          <NavLinkStyle to={`/users/${user?.id}`}>
             <Person />
             <span>Profile</span>
           </NavLinkStyle>

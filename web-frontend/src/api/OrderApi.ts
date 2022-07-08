@@ -1,10 +1,17 @@
 import { api } from "./axios";
 
 class OrderApi {
-  static getAllOrders(query?: string, signal?: AbortSignal) {
+  static getAllOrders(
+    page: number,
+    limit: number,
+    query?: string,
+    signal?: AbortSignal
+  ) {
     return query
-      ? api.get(`/order/all?query=${query}`, { signal: signal })
-      : api.get("/order/all");
+      ? api.get(`/order/all?query=${query}&page=${page}&limit=${limit}`, {
+          signal: signal,
+        })
+      : api.get(`/order/all?page=${page}&limit=${limit}`);
   }
 
   static getSingleOrder(id: string) {

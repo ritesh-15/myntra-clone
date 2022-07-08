@@ -6,6 +6,7 @@ import { useUser } from "../../app/hooks/useUser";
 import {
   Active,
   LoaderWrapper,
+  Pagination,
   ProductsTopHeading,
   ProductTopBarAction,
   ProductTopBarWrapper,
@@ -24,7 +25,8 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import moment from "moment";
-import { Loader } from "../../components";
+import { Button, Loader } from "../../components";
+import { PaginationResult } from "../../interfaces/PaginateResult";
 
 const Users: FC = (): JSX.Element => {
   // hooks
@@ -34,14 +36,16 @@ const Users: FC = (): JSX.Element => {
   // state
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [paginate, setPaginate] = useState<PaginationResult | null>(null);
 
   // fetch users
-  const fetchUsers = async () => {
+  const fetchUsers = async (page: number = 1, limit: number = 5) => {
     setLoading(true);
     try {
-      const { data } = await UserApi.getAllUsers();
+      const { data } = await UserApi.getAllUsers(page, limit);
       if (data.ok) {
         changeUsersState(data.users);
+        setPaginate(data.result);
       }
       setLoading(false);
     } catch (error: any) {
@@ -58,12 +62,17 @@ const Users: FC = (): JSX.Element => {
     fetchUsers();
   }, [isFetch]);
 
-  if (loading)
-    return (
-      <LoaderWrapper>
-        <Loader />
-      </LoaderWrapper>
-    );
+  const handlePrevious = () => {
+    if (!paginate) return;
+    if (!paginate.previous) return;
+    fetchUsers(paginate.previous.page, paginate.previous.limit);
+  };
+
+  const handleNext = () => {
+    if (!paginate) return;
+    if (!paginate.next) return;
+    fetchUsers(paginate.next.page, paginate.next.limit);
+  };
 
   return (
     <Wrapper>
@@ -87,37 +96,58 @@ const Users: FC = (): JSX.Element => {
         </ProductTopBarAction>
       </ProductTopBarWrapper>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell align="right">User Name</TableCell>
-              <TableCell align="right">User Email</TableCell>
-              <TableCell align="right">User Phone</TableCell>
-              <TableCell align="right">Is Active</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((row) => (
-              <TableRow
-                key={row?.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  <Link to={`/users/${row?.id}`}>{row?.id}</Link>
-                </TableCell>
-                <TableCell align="right">{row?.name}</TableCell>
-                <TableCell align="right">{row?.email}</TableCell>
-                <TableCell align="right">{row?.phoneNumber}</TableCell>
-                <TableCell align="right">
-                  <Active active={row.isActive} />
-                </TableCell>
+      {loading ? (
+        <Loader />
+      ) : (
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell align="right">User Name</TableCell>
+                <TableCell align="right">User Email</TableCell>
+                <TableCell align="right">User Phone</TableCell>
+                <TableCell align="right">Is Active</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {users.map((row) => (
+                <TableRow
+                  key={row?.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    <Link to={`/users/${row?.id}`}>{row?.id}</Link>
+                  </TableCell>
+                  <TableCell align="right">{row?.name}</TableCell>
+                  <TableCell align="right">{row?.email}</TableCell>
+                  <TableCell align="right">{row?.phoneNumber}</TableCell>
+                  <TableCell align="right">
+                    <Active active={row.isActive} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      <Pagination>
+        <Button
+          disabled={paginate && !paginate.previous ? true : false}
+          onClick={handlePrevious}
+          title="Previous"
+          outlined
+        />
+
+        <Button
+          onClick={handleNext}
+          style={{ marginLeft: "1em" }}
+          title="Next"
+          outlined
+          disabled={paginate && !paginate.next ? true : false}
+        />
+      </Pagination>
     </Wrapper>
   );
 };

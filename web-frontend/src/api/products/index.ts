@@ -5,10 +5,10 @@ class ProductApi {
     return api.post("/product/create", data);
   }
 
-  static getAllProducts(query?: string) {
+  static getAllProducts(page: number, limit: number, query?: string) {
     return query
-      ? api.get(`/product/all?query=${query}`)
-      : api.get("/product/all");
+      ? api.get(`/product/all?query=${query}&page=${page}&limit=${limit}`)
+      : api.get(`/product/all?page=${page}&limit=${limit}`);
   }
 
   static getSingleProduct(id: string, refetch: boolean = false) {

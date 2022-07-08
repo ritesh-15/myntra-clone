@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import UserDto from "../dtos/UserDto";
 import HttpError from "../helper/error_handler";
+import { pagination } from "../helper/pagination";
 import { UserInterface } from "../interfaces/UserInterface";
 import PrismaClientProvider from "../providers/provide_prism_client";
 import RedisProvider from "../providers/redis_client";
@@ -27,6 +27,14 @@ class UserController {
   // @access Private Admin
 
   public async getAllUsers(req: Request, res: Response, next: NextFunction) {
+    const { page, size } = req.query;
+
+    const { skip, limit, result } = pagination(
+      page,
+      size,
+      await PrismaClientProvider.get().user.count()
+    );
+
     try {
       const users = await PrismaClientProvider.get().user.findMany({
         select: {
@@ -38,12 +46,15 @@ class UserController {
           isVerified: true,
           isActive: true,
         },
+        skip: skip,
+        take: limit,
       });
 
       return res.status(200).json({
         ok: true,
         message: "Users fetched successfully",
         users,
+        result,
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal Server Error"));

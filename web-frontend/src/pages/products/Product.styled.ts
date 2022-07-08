@@ -80,3 +80,9 @@ export const LoaderWrapper = styled(Wrapper)`
   align-items: center;
   justify-content: center;
 `;
+
+export const Pagination = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 1em;
+`;

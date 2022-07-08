@@ -4,6 +4,7 @@ import { useSnackBar } from "../../app/hooks/useSnackBar";
 import ProductApi from "../../api/products";
 import {
   LoaderWrapper,
+  Pagination,
   ProductsTopHeading,
   ProductsWrapper,
   ProductTopBarAction,
@@ -14,6 +15,7 @@ import {
   Wrapper,
 } from "./Product.styled";
 import {
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -27,6 +29,8 @@ import { Add, RefreshOutlined } from "@mui/icons-material";
 import { Button, Loader } from "../../components";
 import moment from "moment";
 import { api } from "../../api/axios";
+import ReactPaginate from "react-paginate";
+import { PaginationResult } from "../../interfaces/PaginateResult";
 
 const Products: FC = (): JSX.Element => {
   // hooks
@@ -36,9 +40,9 @@ const Products: FC = (): JSX.Element => {
   const { showSnackbar } = useSnackBar();
 
   // state
-  const [refetch, setRefetch] = useState(false);
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [paginate, setPaginate] = useState<PaginationResult | null>(null);
 
   useEffect(() => {
     if (!search) return;
@@ -60,12 +64,13 @@ const Products: FC = (): JSX.Element => {
     };
   }, [search]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page: number, limit: number) => {
     setLoading(true);
     try {
-      const { data } = await ProductApi.getAllProducts();
+      const { data } = await ProductApi.getAllProducts(page, limit);
       changeProductsState(data.products);
       setLoading(false);
+      setPaginate(data.result);
     } catch (error: any) {
       setLoading(false);
       showSnackbar(error.response.data.message, true);
@@ -74,20 +79,24 @@ const Products: FC = (): JSX.Element => {
 
   useEffect(() => {
     if (isFetch) return;
-
-    fetchProducts();
+    fetchProducts(1, 5);
   }, [isFetch]);
 
-  if (loading)
-    return (
-      <LoaderWrapper>
-        <Loader />
-      </LoaderWrapper>
-    );
+  const handlePrevious = () => {
+    if (!paginate) return;
+    if (!paginate.previous) return;
+    fetchProducts(paginate.previous.page, paginate.previous.limit);
+  };
+
+  const handleNext = () => {
+    if (!paginate) return;
+    if (!paginate.next) return;
+    fetchProducts(paginate.next.page, paginate.next.limit);
+  };
 
   return (
     <Wrapper>
-      <Refetch onClick={() => fetchProducts()}>
+      <Refetch onClick={() => fetchProducts(1, 5)}>
         <RefreshOutlined />
       </Refetch>
       <ProductTopBarWrapper>
@@ -111,36 +120,56 @@ const Products: FC = (): JSX.Element => {
       </ProductTopBarWrapper>
 
       <ProductsWrapper>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell align="right">Product Name</TableCell>
-                <TableCell align="right">Product Category</TableCell>
-                <TableCell align="right">Created At</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {products.map((row) => (
-                <TableRow
-                  key={row?.id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    <Link to={`/products/${row?.id}`}>{row?.id}</Link>
-                  </TableCell>
-                  <TableCell align="right">{row?.name}</TableCell>
-                  <TableCell align="right">{row?.catagory?.name}</TableCell>
-                  <TableCell align="right">
-                    {moment(row?.createdAt).format("hh:mm A, DD MMMM YY")}
-                  </TableCell>
+        {loading ? (
+          <Loader />
+        ) : (
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell align="right">Product Name</TableCell>
+                  <TableCell align="right">Product Category</TableCell>
+                  <TableCell align="right">Created At</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {products.map((row) => (
+                  <TableRow
+                    key={row?.id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      <Link to={`/products/${row?.id}`}>{row?.id}</Link>
+                    </TableCell>
+                    <TableCell align="right">{row?.name}</TableCell>
+                    <TableCell align="right">{row?.catagory?.name}</TableCell>
+                    <TableCell align="right">
+                      {moment(row?.createdAt).format("hh:mm A, DD MMMM YY")}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </ProductsWrapper>
+      <Pagination>
+        <Button
+          disabled={paginate && !paginate.previous ? true : false}
+          onClick={handlePrevious}
+          title="Previous"
+          outlined
+        />
+
+        <Button
+          onClick={handleNext}
+          style={{ marginLeft: "1em" }}
+          title="Next"
+          outlined
+          disabled={paginate && !paginate.next ? true : false}
+        />
+      </Pagination>
     </Wrapper>
   );
 };

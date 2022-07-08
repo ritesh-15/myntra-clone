@@ -9,8 +9,10 @@ class UserApi {
     return api.post("/auth/login", data);
   }
 
-  static getAllUsers(query?: string) {
-    return query ? api.get(`/user/all?query=${query}`) : api.get("/user/all");
+  static getAllUsers(page: number = 1, limit: number = 5, query?: string) {
+    return query
+      ? api.get(`/user/all?query=${query}&page=${page}&size=${limit}`)
+      : api.get(`/user/all?page=${page}&size=${limit}`);
   }
 
   static getSingleUser(id: string) {
