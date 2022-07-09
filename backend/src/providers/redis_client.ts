@@ -7,7 +7,9 @@ class RedisProvider {
 
   static getInstance(): RedisClientType {
     if (RedisProvider.client == null) {
-      RedisProvider.client = createClient();
+      RedisProvider.client = createClient({
+        url: process.env.REDIS_URL || "redis://localhost:6379",
+      });
     }
     return RedisProvider.client;
   }
