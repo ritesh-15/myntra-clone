@@ -56,10 +56,20 @@ class AuthController {
         return next(HttpError.badRequest("User already exists"));
       }
 
+      console.log(email);
+
       // create user
       await PrismaClientProvider.get().user.create({
         data: {
-          email,
+          email: email,
+          isActive: false,
+          isAdmin: false,
+          isVerified: false,
+          name: "",
+          password: "",
+          phoneNumber: "",
+          resetToken: "",
+          resetTokenExpiry: null,
         },
       });
 
@@ -72,11 +82,12 @@ class AuthController {
 
       return res.status(201).json({
         message: "One time password sent successfully!",
-        otp: newOtp.otp,
+        email: email,
         hash: `${newOtp.hash}.${newOtp.expiresIn}`,
         ok: true,
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.log(error);
       return next(HttpError.internalServerError("Internal Server Error"));
     }
   }
@@ -294,9 +305,9 @@ class AuthController {
 
       return res.status(201).json({
         message: "One time password sent successfully!",
-        otp: newOtp.otp,
         hash: `${newOtp.hash}.${newOtp.expiresIn}`,
         ok: true,
+        email: email,
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal Server Error"));

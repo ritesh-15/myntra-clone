@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@prisma/client": "^3.15.1",
+    "@prisma/client": "^4.0.0",
     "@sendgrid/mail": "^7.7.0",
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.30.0",
