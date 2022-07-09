@@ -88,6 +88,7 @@ class ProductController {
       // upload images
       const files = req.files as Express.Multer.File[];
 
+      console.log(req.files);
       console.log(files);
 
       await Promise.all(
