@@ -71,6 +71,8 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT} 🚀`);
 });
 
+// to quit the redis
+
 process.on("SIGINT", () => {
   client.quit();
 });
