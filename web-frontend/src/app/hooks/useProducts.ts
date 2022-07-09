@@ -8,6 +8,8 @@ import {
   setProductInMapById,
   getProductInMapById,
   setProductCategories,
+  PaginateState,
+  setPaginateData,
 } from "../slices/productSlice";
 import { RootState } from "../store";
 
@@ -19,6 +21,7 @@ export const useProducts = () => {
     currentSetProduct,
     categories,
     isCategoriesFetched,
+    paginate,
   } = useSelector((state: RootState) => state.products);
 
   const changeProductsState = (products: ProductInterface[]) => {
@@ -37,6 +40,13 @@ export const useProducts = () => {
     dispatch(setProductCategories(categories));
   };
 
+  const changePaginate = (paginate: {
+    next: PaginateState | null;
+    previous: PaginateState | null;
+  }) => {
+    dispatch(setPaginateData(paginate));
+  };
+
   return {
     changeProductsState,
     products,
@@ -47,5 +57,7 @@ export const useProducts = () => {
     changeCategoriesState,
     categories,
     isCategoriesFetched,
+    changePaginate,
+    paginate,
   };
 };

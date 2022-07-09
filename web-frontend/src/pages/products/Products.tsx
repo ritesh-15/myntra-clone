@@ -35,14 +35,14 @@ import { PaginationResult } from "../../interfaces/PaginateResult";
 const Products: FC = (): JSX.Element => {
   // hooks
 
-  const { changeProductsState, products, isFetch } = useProducts();
+  const { changeProductsState, products, isFetch, paginate, changePaginate } =
+    useProducts();
 
   const { showSnackbar } = useSnackBar();
 
   // state
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [paginate, setPaginate] = useState<PaginationResult | null>(null);
 
   useEffect(() => {
     if (!search) return;
@@ -70,7 +70,7 @@ const Products: FC = (): JSX.Element => {
       const { data } = await ProductApi.getAllProducts(page, limit);
       changeProductsState(data.products);
       setLoading(false);
-      setPaginate(data.result);
+      changePaginate(data.result);
     } catch (error: any) {
       setLoading(false);
       showSnackbar(error.response.data.message, true);
@@ -155,20 +155,19 @@ const Products: FC = (): JSX.Element => {
         )}
       </ProductsWrapper>
       <Pagination>
-        <Button
-          disabled={paginate && !paginate.previous ? true : false}
-          onClick={handlePrevious}
-          title="Previous"
-          outlined
-        />
+        {paginate && paginate.previous && (
+          <Button onClick={handlePrevious} title="Previous" outlined />
+        )}
 
-        <Button
-          onClick={handleNext}
-          style={{ marginLeft: "1em" }}
-          title="Next"
-          outlined
-          disabled={paginate && !paginate.next ? true : false}
-        />
+        {paginate && paginate.next && (
+          <Button
+            onClick={handleNext}
+            style={{ marginLeft: "1em" }}
+            title="Next"
+            outlined
+            disabled={paginate && !paginate.next ? true : false}
+          />
+        )}
       </Pagination>
     </Wrapper>
   );

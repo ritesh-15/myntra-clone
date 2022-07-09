@@ -31,12 +31,12 @@ import { PaginationResult } from "../../interfaces/PaginateResult";
 const Orders: FC = (): JSX.Element => {
   // hooks
   const { showSnackbar } = useSnackBar();
-  const { changeOrdersState, orders, isFetch } = useOrders();
+  const { changeOrdersState, orders, isFetch, changePaginate, paginate } =
+    useOrders();
 
   // state
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [paginate, setPaginate] = useState<PaginationResult | null>(null);
 
   // get orders
   const fetchOrders = async (
@@ -55,7 +55,7 @@ const Orders: FC = (): JSX.Element => {
       );
       if (data.ok) {
         changeOrdersState(data.orders);
-        setPaginate(data.result);
+        changePaginate(data.result);
       }
       showSnackbar("Orders fetched successfully!");
       setLoading(false);
@@ -164,20 +164,19 @@ const Orders: FC = (): JSX.Element => {
         )}
       </OrdersWrapper>
       <Pagination>
-        <Button
-          disabled={paginate && !paginate.previous ? true : false}
-          onClick={handlePrevious}
-          title="Previous"
-          outlined
-        />
+        {paginate && paginate.previous && (
+          <Button onClick={handlePrevious} title="Previous" outlined />
+        )}
 
-        <Button
-          onClick={handleNext}
-          style={{ marginLeft: "1em" }}
-          title="Next"
-          outlined
-          disabled={paginate && !paginate.next ? true : false}
-        />
+        {paginate && paginate.next && (
+          <Button
+            onClick={handleNext}
+            style={{ marginLeft: "1em" }}
+            title="Next"
+            outlined
+            disabled={paginate && !paginate.next ? true : false}
+          />
+        )}
       </Pagination>
     </Wrapper>
   );

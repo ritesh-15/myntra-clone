@@ -42,6 +42,7 @@ const CreateProduct: FC = (): JSX.Element => {
       measurement: "",
     },
   ]);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const [images, setImages] = useState<File[]>([]);
 
@@ -71,11 +72,15 @@ const CreateProduct: FC = (): JSX.Element => {
 
     formData.append("data", JSON.stringify(data));
 
+    setSubmitting(true);
+
     try {
       const response = await ProductApi.createProduct(formData);
       showSnackbar(response.data.message);
       navigate("/products", { replace: true });
+      setSubmitting(false);
     } catch (error: any) {
+      setSubmitting(false);
       showSnackbar("Something went wrong!", true);
     }
   };
@@ -346,6 +351,7 @@ const CreateProduct: FC = (): JSX.Element => {
         <br />
 
         <Button
+          loading={submitting}
           type="submit"
           onClick={handleSubmit}
           title="Create"

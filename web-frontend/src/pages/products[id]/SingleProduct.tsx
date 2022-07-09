@@ -202,6 +202,7 @@ const SingleProduct: FC = (): JSX.Element => {
       showSnackbar("Product deleted successfully");
       changeProductsState(products.filter((it) => it.id !== product.id));
       setDeleteLoading(false);
+      navigate("/products");
     } catch (error: any) {
       navigate("/products");
       showSnackbar(error.response.data.message, true);

@@ -4,6 +4,10 @@ import {
   ProductInterface,
 } from "../../interfaces/product/ProductInterface";
 
+export interface PaginateState {
+  page: number;
+  limit: number;
+}
 interface ProductState {
   products: ProductInterface[];
   isFetch: boolean;
@@ -11,6 +15,10 @@ interface ProductState {
   currentSetProduct: ProductInterface | null;
   categories: ProductCategory[];
   isCategoriesFetched: boolean;
+  paginate: {
+    next: PaginateState | null;
+    previous: PaginateState | null;
+  } | null;
 }
 
 const initialState: ProductState = {
@@ -20,6 +28,7 @@ const initialState: ProductState = {
   currentSetProduct: null,
   categories: [],
   isCategoriesFetched: false,
+  paginate: null,
 };
 
 const productSlice = createSlice({
@@ -39,6 +48,15 @@ const productSlice = createSlice({
     setProductCategories: (state, action: PayloadAction<ProductCategory[]>) => {
       state.categories = action.payload;
     },
+    setPaginateData: (
+      state,
+      action: PayloadAction<{
+        next: PaginateState | null;
+        previous: PaginateState | null;
+      }>
+    ) => {
+      state.paginate = action.payload;
+    },
   },
 });
 
@@ -47,6 +65,7 @@ export const {
   setProductInMapById,
   getProductInMapById,
   setProductCategories,
+  setPaginateData,
 } = productSlice.actions;
 
 export default productSlice.reducer;
