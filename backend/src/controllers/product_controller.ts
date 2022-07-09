@@ -88,9 +88,10 @@ class ProductController {
       // upload images
       const files = req.files as Express.Multer.File[];
 
-      const dres = await Promise.all(
+      console.log(files);
+
+      await Promise.all(
         files.map(async (file) => {
-          console.log(file);
           const uploaded = await CludinaryHelper.uploadImage(file.path);
           fs.unlink(file.path, () => {});
           await PrismaClientProvider.get().image.create({
