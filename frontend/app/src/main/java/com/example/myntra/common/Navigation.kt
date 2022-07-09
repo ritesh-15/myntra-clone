@@ -3,8 +3,10 @@ package com.example.myntra.common
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.myntra.presentation.ResetPasswordScreen
 import com.example.myntra.presentation.complete_sign_up.CompleteSignUpScreen
 import com.example.myntra.presentation.home_screen.HomeScreen
@@ -26,8 +28,20 @@ fun Navigation(navController: NavHostController) {
             LoginSignUpScreen(navController = navController)
         }
 
-        composable(route = Screen.VerifyOtpScreen.route) {
-            VerifyOtpScreen(navController = navController)
+        composable(route = Screen.VerifyOtpScreen.route,
+            arguments = listOf(
+                navArgument(name = Constants.VERIFY_OTP_HASH)
+                {
+                    type = NavType.StringType
+                },
+                navArgument(name = Constants.VERIFY_OTP_EMAIL)
+                {
+                    type = NavType.StringType
+                }))
+        {
+            VerifyOtpScreen(navController = navController,
+                it.arguments?.getString(Constants.VERIFY_OTP_EMAIL)!!,
+                it.arguments?.getString(Constants.VERIFY_OTP_HASH)!!)
         }
 
         composable(route = Screen.LinkCreateAccountScreen.route) {

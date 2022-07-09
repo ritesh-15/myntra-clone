@@ -7,6 +7,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -26,7 +29,12 @@ import com.example.myntra.ui.theme.light
 import com.example.myntra.ui.theme.primary
 
 @Composable
-fun VerifyOtpScreen(navController: NavController) {
+fun VerifyOtpScreen(navController: NavController, email:String, hash:String) {
+    // state
+    val otp by remember {
+        mutableStateOf(0)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -58,7 +66,7 @@ fun VerifyOtpScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = "Send vai Email to riteshkhore@gmail.com",
+            Text(text = "Send vai Email to $email",
                 fontSize = 12.sp,
                 fontFamily = Poppins
             )
@@ -118,5 +126,5 @@ fun VerifyOtpScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun VerifyOtpScreenPreview() {
-    VerifyOtpScreen(rememberNavController())
+    VerifyOtpScreen(rememberNavController(),"","")
 }

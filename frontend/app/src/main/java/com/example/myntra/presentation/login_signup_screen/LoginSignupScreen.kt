@@ -1,5 +1,6 @@
 package com.example.myntra.presentation.login_signup_screen
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -7,7 +8,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -22,15 +24,35 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.myntra.R
 import com.example.myntra.common.Screen
 import com.example.myntra.ui.theme.Poppins
 import com.example.myntra.ui.theme.primary
+import com.example.myntra.ui.theme.red
 
 @Composable
 fun LoginSignUpScreen(navController: NavController) {
+
+    // state
+    val email = remember {
+        mutableStateOf("")
+    }
+
+    val viewModel: LoginSignupViewModel = hiltViewModel()
+    val state = viewModel.state.value
+
+    Log.d("loginSignUp", state.toString())
+
+    if (state.data != null) {
+       LaunchedEffect(Unit){
+           navController.navigate(Screen.VerifyOtpScreen.
+           passEmailAndHash(email = state.data.email,
+               hash = state.data.hash))
+       }
+    }
 
     Scaffold(
         topBar = {
@@ -80,7 +102,7 @@ fun LoginSignUpScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
             // input
-            OutlinedTextField(value = "", onValueChange = {},
+            OutlinedTextField(value = email.value, onValueChange = { email.value = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text(text = "Email Address", fontFamily = Poppins)
@@ -96,7 +118,13 @@ fun LoginSignUpScreen(navController: NavController) {
                 )
             )
 
+            if (state.error != null) {
+                Text(text = state.error, color = red,
+                    modifier = Modifier.padding(8.dp))
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
+
             // privacy policy
             Text(text = buildAnnotatedString {
                 append("By continuing, I agree to the ")
@@ -119,7 +147,7 @@ fun LoginSignUpScreen(navController: NavController) {
             // button
             Button(
                 onClick = {
-                    navController.navigate(route = Screen.VerifyOtpScreen.route)
+                    viewModel.resendOtpOrRegister(email = email.value)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -127,7 +155,19 @@ fun LoginSignUpScreen(navController: NavController) {
                     contentColor = Color.White
                 ),
                 contentPadding = PaddingValues(vertical = 12.dp),
+                enabled = !state.loading
             ) {
+                if (state.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .height(20.dp)
+                            .width(20.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                }
+
                 Text(text = "Continue", fontFamily = Poppins)
             }
 
