@@ -11,6 +11,8 @@ router
   .route("/order/all")
   .get([authenticate, isAdmin], orderController.getAllOrders);
 
+router.route("/order/payment").post([authenticate], orderController.payment);
+
 router
   .route("/order/:id")
   .get(authenticate, orderController.getOrderById)

@@ -10,3 +10,6 @@ export const CLOUDINARY_API_SECRET: string =
 export const CLOUDINARY_API_KEY: string = process.env.CLOUDINARY_API_KEY!!;
 export const CLOUDINARY_CLOUD_NAME: string =
   process.env.CLOUDINARY_CLOUD_NAME!!;
+
+export const RAZORPAY_API_KEY: string = process.env.RAZORPAY_API_KEY!!;
+export const RAZORPAY_KEY_SECRET: string = process.env.RAZORPAY_KEY_SECRET!!;

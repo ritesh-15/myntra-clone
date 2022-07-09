@@ -6,6 +6,8 @@ import { UserInterface } from "../interfaces/UserInterface";
 import PrismaClientProvider from "../providers/provide_prism_client";
 import RedisProvider from "../providers/redis_client";
 import { createOrderSchema } from "../validation/order";
+import Razorpay from "razorpay";
+import { RAZORPAY_API_KEY, RAZORPAY_KEY_SECRET } from "../keys/secrets";
 
 interface CreateOrder {
   products: Product[];
@@ -98,6 +100,38 @@ class OrderController {
       return res.status(201).json({
         message: "Order created successfully",
         ok: true,
+      });
+    } catch (error) {
+      return next(HttpError.internalServerError("Internal server error"));
+    }
+  }
+
+  // @route POST /api/order/payment
+  // @desc Do the payment
+  // @access Private
+
+  public async payment(req: Request, res: Response, next: NextFunction) {
+    const { amount } = req.body;
+
+    if (!amount)
+      return next(HttpError.unporcessableEntity("Amount is required"));
+
+    const instance = new Razorpay({
+      key_id: RAZORPAY_API_KEY,
+      key_secret: RAZORPAY_KEY_SECRET,
+    });
+
+    try {
+      const payment = await instance.orders.create({
+        amount: amount * 100,
+        currency: "INR",
+        receipt: `${Math.floor(Math.random() * 1000000)}`,
+      });
+
+      return res.json({
+        ok: true,
+        message: "Payment created successfully",
+        payment,
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal server error"));

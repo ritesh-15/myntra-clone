@@ -88,17 +88,19 @@ class ProductController {
       // upload images
       const files = req.files as Express.Multer.File[];
 
-      files.map(async (file) => {
-        const uploaded = await CludinaryHelper.uploadImage(file.path);
-        fs.unlink(file.path, () => {});
-        await PrismaClientProvider.get().image.create({
-          data: {
-            productId: product.id,
-            url: uploaded.secure_url,
-            publicId: uploaded.public_id,
-          },
-        });
-      });
+      const dres = await Promise.all(
+        files.map(async (file) => {
+          const uploaded = await CludinaryHelper.uploadImage(file.path);
+          fs.unlink(file.path, () => {});
+          await PrismaClientProvider.get().image.create({
+            data: {
+              productId: product.id,
+              url: uploaded.secure_url,
+              publicId: uploaded.public_id,
+            },
+          });
+        })
+      );
 
       return res.status(201).json({
         ok: true,
@@ -487,14 +489,16 @@ class ProductController {
         },
       });
 
-      images.map(async (image) => {
-        await CludinaryHelper.deleteImage(image.publicId);
-        await PrismaClientProvider.get().image.delete({
-          where: {
-            id: image.id,
-          },
-        });
-      });
+      await Promise.all(
+        images.map(async (image) => {
+          await CludinaryHelper.deleteImage(image.publicId);
+          await PrismaClientProvider.get().image.delete({
+            where: {
+              id: image.id,
+            },
+          });
+        })
+      );
 
       // remove the sizes from database
       await PrismaClientProvider.get().size.deleteMany({
@@ -603,14 +607,6 @@ class ProductController {
     res: Response,
     next: NextFunction
   ) {
-    const { page, size } = req.query;
-
-    const { skip, limit, result } = pagination(
-      page,
-      size,
-      await PrismaClientProvider.get().catagory.count()
-    );
-
     try {
       const categories = await PrismaClientProvider.get().catagory.findMany({
         select: {
@@ -618,15 +614,12 @@ class ProductController {
           name: true,
           createdAt: true,
         },
-        skip,
-        take: limit,
       });
 
       return res.status(200).json({
         ok: true,
         message: "Categories fetched successfully",
         categories,
-        result,
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal Server Error"));
