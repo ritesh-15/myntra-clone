@@ -28,8 +28,17 @@ PrismaClientProvider.get()
 // redis connection
 const client = RedisProvider.getInstance();
 
-client.connect().then(() => {
-  console.log("Redis connected");
+client
+  .connect()
+  .then(() => {
+    console.log("Redis connected");
+  })
+  .catch((error) => {
+    console.log(`Redis client error ${error}`);
+  });
+
+client.on("error", (error) => {
+  console.log(`Redis client error ${error}`);
 });
 
 // middlewares
