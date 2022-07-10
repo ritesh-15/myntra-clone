@@ -1,5 +1,6 @@
 package com.example.myntra.presentation.login_signup_screen
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -30,24 +31,30 @@ class LoginSignupViewModel @Inject constructor(
     private val _state = mutableStateOf(LoginSignupState())
     val state: State<LoginSignupState> = _state
 
-    fun resendOtpOrRegister(email: String, register: Boolean = false) {
+    val email = mutableStateOf("")
+
+    fun onEmailChange(it:String){
+        email.value = it
+    }
+
+    fun resendOtpOrRegister(register: Boolean = false) {
 
         // check if valid email or not
-        if (email.isEmpty()){
+        if (email.value.isEmpty()){
             _state.value = LoginSignupState(error= "Email address is required!")
             return
         }
 
-        if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+        if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
             _state.value = LoginSignupState(error= "Email address is not valid!")
             return
         }
 
         val response = if (register) {
-                registerUseCase.invoke(RegisterBody(email = email))
+                registerUseCase.invoke(RegisterBody(email = email.value))
             } else {
                 resendOtpUseCase.invoke(
-                    ResendOtpBody(email = email))
+                    ResendOtpBody(email = email.value))
             }
 
         viewModelScope.launch {
@@ -68,7 +75,8 @@ class LoginSignupViewModel @Inject constructor(
                             _state.value = LoginSignupState(error = error.message, loading = false)
 
                             if (error.status == 400 && !register){
-                                resendOtpOrRegister(email = email, register = true)
+                                Log.d("register view model","Register function called")
+                                resendOtpOrRegister(register = true)
                             }
 
                         } else {

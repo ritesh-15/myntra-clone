@@ -1,52 +1,46 @@
-package com.example.myntra.presentation.login_screen
+package com.example.myntra.presentation.refresh_screen
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myntra.common.Constants
 import com.example.myntra.common.utils.Resource
-import com.example.myntra.data.api.authentication.body.LoginBody
-import com.example.myntra.data.api.authentication.response.LoginResponse
+import com.example.myntra.data.api.authentication.body.RegisterBody
+import com.example.myntra.data.api.authentication.body.ResendOtpBody
+import com.example.myntra.data.api.authentication.response.ResendOtpResponse
 import com.example.myntra.domain.model.ApiError
-import com.example.myntra.domain.usecases.authentication.LoginUseCase
+import com.example.myntra.domain.usecases.authentication.RefreshUseCase
+import com.example.myntra.domain.usecases.authentication.RegisterUseCase
+import com.example.myntra.domain.usecases.authentication.ResendOtpUseCase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
-    private val pref:SharedPreferences
+class RefreshViewModel @Inject constructor(
+    private val refreshUseCase: RefreshUseCase,
+    private val pref: SharedPreferences,
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(LoginViewModelState())
-    val state: State<LoginViewModelState> = _state
+    private val _state = mutableStateOf(RefreshState())
+    val state: State<RefreshState> = _state
 
-    val email = mutableStateOf("")
-    val password = mutableStateOf("")
-
-    fun onEmailChange(it: String) {
-        email.value = it
+    init {
+        refresh()
     }
 
-    fun onPasswordChange(it: String) {
-        password.value = it
-    }
-
-    fun login() {
-        val response = loginUseCase.invoke(LoginBody(email = email.value, password = password.value))
+    fun refresh() {
+        val response = refreshUseCase.invoke()
 
         viewModelScope.launch {
             response.collect {
                 when (it) {
                     is Resource.Loading -> {
-                        _state.value = LoginViewModelState(loading = true)
+                        _state.value = RefreshState(loading = true)
                     }
 
                     is Resource.Success -> {
@@ -58,22 +52,21 @@ class LoginViewModel @Inject constructor(
                             apply()
                         }
 
-                        _state.value = LoginViewModelState(loading = false, data = it.data)
+                        _state.value = RefreshState(loading = false, data = it.data)
                     }
 
                     is Resource.Error -> {
                         if (it.errorBody != null) {
                             val error = Gson().fromJson(it.errorBody.string(),
-                                ApiError::class.java).message
-                            _state.value = LoginViewModelState(error = error, loading = false)
+                                ApiError::class.java)
+                            _state.value = RefreshState(error = error.message, loading = false)
+
                         } else {
-                            _state.value = LoginViewModelState(loading = false, error = it.message)
+                            _state.value = RefreshState(loading = false, error = it.message)
                         }
                     }
                 }
             }
         }
-
     }
-
 }

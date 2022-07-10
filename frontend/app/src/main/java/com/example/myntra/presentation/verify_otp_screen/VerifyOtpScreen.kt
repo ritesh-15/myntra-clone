@@ -6,12 +6,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -21,18 +19,51 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.myntra.common.Screen
+import com.example.myntra.common.utils.TokenHandler
 import com.example.myntra.ui.theme.Poppins
 import com.example.myntra.ui.theme.light
 import com.example.myntra.ui.theme.primary
+import com.example.myntra.ui.theme.red
 
 @Composable
-fun VerifyOtpScreen(navController: NavController, email:String, hash:String) {
+fun VerifyOtpScreen(
+    navController: NavController,
+    email: String,
+    hash: String,
+    viewModel: VerifyOtpViewModel = hiltViewModel(),
+) {
     // state
-    val otp by remember {
-        mutableStateOf(0)
+
+    val context = LocalContext.current
+
+    val otp = remember {
+        mutableStateOf("")
+    }
+
+    // view model
+
+    val state = viewModel.state.value
+
+    if (state.data != null) {
+        LaunchedEffect(Unit) {
+            if (state.data.user.isActive){
+                navController.navigate(Screen.Home.passUser(state.data.user.name)) {
+                    popUpTo(Screen.Home.route) {
+                        inclusive = true
+                    }
+                }
+            }else{
+                navController.navigate(Screen.CompleteSignUpScreen.route) {
+                    popUpTo(Screen.CompleteSignUpScreen.route) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -73,7 +104,9 @@ fun VerifyOtpScreen(navController: NavController, email:String, hash:String) {
 
             Spacer(modifier = Modifier.height(16.dp))
             // input
-            OutlinedTextField(value = "", onValueChange = {},
+            OutlinedTextField(value = otp.value, onValueChange = {
+                otp.value = it
+            },
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text(text = "One time password", fontFamily = Poppins)
@@ -89,11 +122,17 @@ fun VerifyOtpScreen(navController: NavController, email:String, hash:String) {
                 )
             )
 
+            if (state.error != null) {
+                Text(text = state.error, color = red,
+                    modifier = Modifier.padding(8.dp))
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
+
             // button
             Button(
                 onClick = {
-                    navController.navigate(route = Screen.LinkCreateAccountScreen.route)
+                    viewModel.verifyOtp(email = email, hash = hash, otp = otp.value.toInt())
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -101,9 +140,22 @@ fun VerifyOtpScreen(navController: NavController, email:String, hash:String) {
                     contentColor = Color.White
                 ),
                 contentPadding = PaddingValues(vertical = 12.dp),
+                enabled = !state.loading
             ) {
-                Text(text = "Continue".uppercase(), fontFamily = Poppins)
+                if (state.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .height(20.dp)
+                            .width(20.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                }
+
+                Text(text = "Verify", fontFamily = Poppins)
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -126,5 +178,5 @@ fun VerifyOtpScreen(navController: NavController, email:String, hash:String) {
 @Preview(showBackground = true)
 @Composable
 fun VerifyOtpScreenPreview() {
-    VerifyOtpScreen(rememberNavController(),"","")
+    VerifyOtpScreen(rememberNavController(), "", "")
 }

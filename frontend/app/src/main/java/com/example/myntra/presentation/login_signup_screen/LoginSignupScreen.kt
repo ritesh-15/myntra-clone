@@ -34,24 +34,22 @@ import com.example.myntra.ui.theme.primary
 import com.example.myntra.ui.theme.red
 
 @Composable
-fun LoginSignUpScreen(navController: NavController) {
+fun LoginSignUpScreen(
+    navController: NavController,
+    viewModel: LoginSignupViewModel = hiltViewModel(),
+) {
 
-    // state
-    val email = remember {
-        mutableStateOf("")
-    }
-
-    val viewModel: LoginSignupViewModel = hiltViewModel()
     val state = viewModel.state.value
 
-    Log.d("loginSignUp", state.toString())
-
     if (state.data != null) {
-       LaunchedEffect(Unit){
-           navController.navigate(Screen.VerifyOtpScreen.
-           passEmailAndHash(email = state.data.email,
-               hash = state.data.hash))
-       }
+        LaunchedEffect(Unit) {
+            navController.navigate(Screen.VerifyOtpScreen.passEmailAndHash(email = state.data.email,
+                hash = state.data.hash)){
+                popUpTo(Screen.LoginSignUp.route){
+                    inclusive = true
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -78,7 +76,6 @@ fun LoginSignUpScreen(navController: NavController) {
         ) {
 
             // image
-
             Image(painter = painterResource(id = R.drawable.ic_auth),
                 contentDescription = null)
 
@@ -102,7 +99,8 @@ fun LoginSignUpScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
             // input
-            OutlinedTextField(value = email.value, onValueChange = { email.value = it },
+            OutlinedTextField(value = viewModel.email.value,
+                onValueChange = { viewModel.onEmailChange(it) },
                 modifier = Modifier.fillMaxWidth(),
                 label = {
                     Text(text = "Email Address", fontFamily = Poppins)
@@ -115,13 +113,13 @@ fun LoginSignUpScreen(navController: NavController) {
                     cursorColor = primary,
                     focusedBorderColor = primary,
                     focusedLabelColor = primary
-                )
+                ),
+                singleLine = true,
+                isError = state.error != null
             )
 
-            if (state.error != null) {
-                Text(text = state.error, color = red,
-                    modifier = Modifier.padding(8.dp))
-            }
+            if (state.error != null)
+                Text(text = state.error, color = red, fontSize = 12.sp)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -147,7 +145,7 @@ fun LoginSignUpScreen(navController: NavController) {
             // button
             Button(
                 onClick = {
-                    viewModel.resendOtpOrRegister(email = email.value)
+                    viewModel.resendOtpOrRegister()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -173,6 +171,7 @@ fun LoginSignUpScreen(navController: NavController) {
 
 
             Spacer(modifier = Modifier.height(16.dp))
+
             // get help
             Text(text = buildAnnotatedString {
                 append("Having trouble logging in? ")
@@ -189,7 +188,7 @@ fun LoginSignUpScreen(navController: NavController) {
 
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+
 @Preview(showBackground = true)
 @Composable
 fun LoginSignUpScreenPreview() {

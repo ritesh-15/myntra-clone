@@ -9,16 +9,11 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
-)
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = primary,
+    primaryVariant = primaryVariant,
+    secondary = primary
 
     /* Other default colors to override
     background = Color.White,
@@ -39,11 +34,7 @@ fun MyntraTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
         systemUiController.setStatusBarColor(Color.White, darkIcons = true)
     }
 
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
+    val colors = LightColorPalette
 
     MaterialTheme(
         colors = colors,

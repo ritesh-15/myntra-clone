@@ -1,32 +1,44 @@
 package com.example.myntra.presentation.home_screen
 
+import android.util.Log
+import android.widget.Space
+import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.myntra.common.bottom_navigation.AppBottomNavigation
 import com.example.myntra.R
+import com.example.myntra.common.Screen
 import com.example.myntra.common.nav_drawer.DrawerBody
 import com.example.myntra.common.nav_drawer.DrawerHeader
 import com.example.myntra.common.nav_drawer.NavDrawerItem
+import com.example.myntra.domain.model.Product
+import com.example.myntra.domain.model.User
+import com.example.myntra.ui.theme.Poppins
 import com.example.myntra.ui.theme.dotLight
 import com.example.myntra.ui.theme.light
 import com.example.myntra.ui.theme.primary
@@ -36,10 +48,30 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(
+    navController: NavHostController,
+    userName: String? = null,
+    vIewModel: HomeScreenVIewModel = hiltViewModel(),
+) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+
+    // state
+    val state = vIewModel.state.value
+    val context = LocalContext.current
+
+    if (state.error != null) {
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    Log.d("products", state.toString())
+
 
     // Top bar
     Scaffold(
@@ -51,7 +83,7 @@ fun HomeScreen(navController: NavHostController) {
             })
         },
         drawerContent = {
-            DrawerHeader(navController = navController)
+            DrawerHeader(navController = navController, userName = userName)
             DrawerBody(items = listOf(
                 NavDrawerItem(id = "categories",
                     icon = painterResource(id = R.drawable.ic_catogiries_outlined),
@@ -70,43 +102,120 @@ fun HomeScreen(navController: NavHostController) {
         bottomBar = { AppBottomNavigation(navController = navController) }
     ) {
 
-        Column(
+        LazyVerticalGrid(
+            cells = GridCells.Fixed(2),
             modifier = Modifier
-                .fillMaxSize()
                 .background(light)
-                .verticalScroll(
-                    rememberScrollState()
-                )
+                .padding(bottom = 16.dp),
         ) {
-            // image slider
-            ImageSlider()
 
-            Spacer(modifier = Modifier.height(16.dp))
+            item(span = {
+                GridItemSpan(2)
+            }) {
+                Column {
+                    // image slider
+                    ImageSlider()
 
-            // top picks
-            TopPicks()
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-            //  featured
-            Featured()
+                    // top picks
+                    TopPicks()
 
-            Spacer(modifier = Modifier.height(16.dp))
-            //  featured
-            Featured()
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-            //  featured
-            Featured()
+                    //  featured
+                    Featured()
 
-            Spacer(modifier = Modifier.height(16.dp))
-            // top picks
-            TopPicks()
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            items(state.data?.products ?: emptyList()) { product ->
+                SingleProduct(product = product)
+            }
+        }
+    }
+
+
+}
+
+
+@Composable
+fun SingleProduct(product: Product) {
+    Column(
+        modifier = Modifier
+            .background(Color.White)
+    ) {
+        if (product.images.size > 1) {
+            AsyncImage(model = product.images[0].url,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.height(200.dp)
+            )
+        }
+
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+
+
+            Text(text = product.name,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = Poppins)
+
+            Text(text = product.description,
+                fontSize = 12.sp,
+                fontFamily = Poppins,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Light
+            )
+
+            Row(horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+
+                if (product.discount != 0) {
+                    Text(text = product.originalPrice.toString(),
+                        fontSize = 12.sp,
+                        fontFamily = Poppins,
+                        overflow = TextOverflow.Ellipsis,
+                        fontWeight = FontWeight.Light,
+                        textDecoration = TextDecoration.LineThrough
+                    )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+
+                val price = if (product.discount == 0) {
+                    product.originalPrice.toString()
+                } else {
+                    product.discountPrice.toString()
+                }
+
+                Text(
+                    text = price,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Poppins,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+
+                if (product.discount != 0) {
+                    Text(
+                        text = "${product.discount}% off",
+                        fontSize = 12.sp,
+                        fontFamily = Poppins,
+                        overflow = TextOverflow.Ellipsis,
+                        color = primary,
+                        fontWeight = FontWeight.Light
+                    )
+                }
+
+            }
         }
 
     }
-
 
 }
 
