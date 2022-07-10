@@ -72,6 +72,11 @@ app.use("/api/v1", productRouter);
 app.use("/api/v1", userRouter);
 app.use("/api/v1", orderRouter);
 
+// passport fail
+app.get("/auth/fail", (req: Request, res: Response, next: NextFunction) => {
+  return next(HttpError.unauthorized("Unauthorized!"));
+});
+
 // error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
   return next(HttpError.notFound("No Route Match!"));
