@@ -10,6 +10,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myntra.common.Screen
 import com.example.myntra.ui.theme.primary
 
 @Composable
@@ -31,7 +32,11 @@ fun AppBottomNavigation(navController: NavController) {
             val selected = route == item.route
 
             BottomNavigationItem(selected = selected, onClick = {
-                navController.navigate(item.route)
+                navController.navigate(item.route) {
+                    popUpTo(item.route) {
+                        inclusive = true
+                    }
+                }
             },
                 icon = {
                     if (selected) {

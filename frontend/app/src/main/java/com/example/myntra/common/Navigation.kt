@@ -9,16 +9,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.myntra.domain.model.User
 import com.example.myntra.presentation.ResetPasswordScreen
+import com.example.myntra.presentation.categories_screen.CategoriesScreen
 import com.example.myntra.presentation.complete_sign_up.CompleteSignUpScreen
 import com.example.myntra.presentation.home_screen.HomeScreen
 import com.example.myntra.presentation.link_create_account_screen.LinkCreateAccountScreen
 import com.example.myntra.presentation.login_screen.LoginScreen
 import com.example.myntra.presentation.login_signup_screen.LoginSignUpScreen
 import com.example.myntra.presentation.refresh_screen.RefreshScreen
+import com.example.myntra.presentation.single_category_screen.SingleCategoryScreen
+import com.example.myntra.presentation.single_product_screen.SingleProductScreen
 import com.example.myntra.presentation.verify_otp_screen.VerifyOtpScreen
 import com.google.gson.Gson
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Navigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
@@ -73,6 +75,31 @@ fun Navigation(navController: NavHostController) {
 
         composable(route = Screen.ResetPasswordScreen.route) {
             ResetPasswordScreen(navController = navController)
+        }
+
+        composable(route = Screen.Categories.route) {
+            CategoriesScreen(navController = navController)
+        }
+
+        composable(route = Screen.SingleCategoryScreen.route,
+            arguments = listOf(
+                navArgument("id"){
+                    type = NavType.StringType
+                }
+            )
+            ) {
+            SingleCategoryScreen(navController = navController, id =  it.arguments?.getString("id") ?: "")
+        }
+
+        composable(route = Screen.SingleProductScreen.route,
+            arguments = listOf(
+                navArgument("id"){
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            SingleProductScreen(navController = navController,
+                id = it.arguments?.getString("id") ?: "")
         }
     }
 

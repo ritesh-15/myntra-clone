@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -57,7 +58,7 @@ fun HomeScreen(
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-    val scrollState = rememberScrollState()
+
 
     // state
     val state = vIewModel.state.value
@@ -68,9 +69,6 @@ fun HomeScreen(
             Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
         }
     }
-
-
-    Log.d("products", state.toString())
 
 
     // Top bar
@@ -105,8 +103,8 @@ fun HomeScreen(
         LazyVerticalGrid(
             cells = GridCells.Fixed(2),
             modifier = Modifier
-                .background(light)
-                .padding(bottom = 16.dp),
+                .background(Color.White)
+                .padding(bottom = 50.dp),
         ) {
 
             item(span = {
@@ -131,7 +129,7 @@ fun HomeScreen(
             }
 
             items(state.data?.products ?: emptyList()) { product ->
-                SingleProduct(product = product)
+                SingleProduct(product = product, navController)
             }
         }
     }
@@ -141,83 +139,95 @@ fun HomeScreen(
 
 
 @Composable
-fun SingleProduct(product: Product) {
-    Column(
+fun SingleProduct(product: Product, navController: NavController) {
+    Card(
         modifier = Modifier
             .background(Color.White)
+            .clickable {
+                navController.navigate(Screen.SingleProductScreen.passId(product.id))
+            },
+        shape = RectangleShape,
+        elevation = 0.dp
     ) {
-        if (product.images.size > 1) {
-            AsyncImage(model = product.images[0].url,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.height(200.dp)
-            )
-        }
 
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
+        Column {
+            if (product.images.size > 1) {
+                AsyncImage(model = product.images[0].url,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.height(200.dp)
+                )
+            }
+
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
 
 
-            Text(text = product.name,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = Poppins)
-
-            Text(text = product.description,
-                fontSize = 12.sp,
-                fontFamily = Poppins,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.Light
-            )
-
-            Row(horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-
-                if (product.discount != 0) {
-                    Text(text = product.originalPrice.toString(),
-                        fontSize = 12.sp,
-                        fontFamily = Poppins,
-                        overflow = TextOverflow.Ellipsis,
-                        fontWeight = FontWeight.Light,
-                        textDecoration = TextDecoration.LineThrough
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
-
-                val price = if (product.discount == 0) {
-                    product.originalPrice.toString()
-                } else {
-                    product.discountPrice.toString()
-                }
-
-                Text(
-                    text = price,
-                    fontSize = 12.sp,
+                Text(text = product.name,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = Poppins, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
+
+                Text(text = product.description,
+                    fontSize = 12.sp,
                     fontFamily = Poppins,
                     overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Light,
+                    maxLines = 1
                 )
-                Spacer(modifier = Modifier.width(4.dp))
 
-                if (product.discount != 0) {
+                Row(horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+
+                    if (product.discount != 0) {
+                        Text(text = "₹ ${product.originalPrice}",
+                            fontSize = 12.sp,
+                            fontFamily = Poppins,
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = FontWeight.Light,
+                            textDecoration = TextDecoration.LineThrough
+                        )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+
+                    val price = if (product.discount == 0) {
+                        product.originalPrice.toString()
+                    } else {
+                        product.discountPrice.toString()
+                    }
+
                     Text(
-                        text = "${product.discount}% off",
+                        text = "₹ $price",
                         fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
                         fontFamily = Poppins,
                         overflow = TextOverflow.Ellipsis,
-                        color = primary,
-                        fontWeight = FontWeight.Light
                     )
-                }
+                    Spacer(modifier = Modifier.width(4.dp))
 
+                    if (product.discount != 0) {
+                        Text(
+                            text = "${product.discount}% off",
+                            fontSize = 12.sp,
+                            fontFamily = Poppins,
+                            overflow = TextOverflow.Ellipsis,
+                            color = primary,
+                            fontWeight = FontWeight.Light
+                        )
+                    }
+
+                }
             }
         }
 
     }
 
 }
+
+
 
 @Composable
 fun Featured() {

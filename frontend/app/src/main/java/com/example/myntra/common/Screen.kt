@@ -7,7 +7,7 @@ sealed class Screen(
 ) {
     object Home : Screen("home_screen/{userName}"){
         fun passUser(userName:String?):String{
-            return "home_screen/{$userName}"
+            return "home_screen/$userName"
         }
     }
 
@@ -35,4 +35,16 @@ sealed class Screen(
     object LoginScreen : Screen("login_screen")
 
     object ResetPasswordScreen : Screen("reset_password_screen")
+
+    object SingleCategoryScreen : Screen("single_category_screen/{id}"){
+        fun passId(id:String):String {
+            return "single_category_screen/$id"
+        }
+    }
+
+    object SingleProductScreen : Screen("single_product_screen/{id}"){
+        fun passId(id:String):String {
+            return "single_product_screen/$id"
+        }
+    }
 }
