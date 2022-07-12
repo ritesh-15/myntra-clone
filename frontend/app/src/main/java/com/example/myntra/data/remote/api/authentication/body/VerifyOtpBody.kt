@@ -1,4 +1,4 @@
-package com.example.myntra.data.api.authentication.body
+package com.example.myntra.data.remote.api.authentication.body
 
 data class VerifyOtpBody(
     val email:String,

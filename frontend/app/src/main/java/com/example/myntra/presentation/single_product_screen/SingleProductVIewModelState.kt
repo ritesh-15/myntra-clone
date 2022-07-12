@@ -1,7 +1,7 @@
 package com.example.myntra.presentation.single_product_screen
 
 
-import com.example.myntra.data.api.products.response.SingleProductResponse
+import com.example.myntra.data.remote.api.products.response.SingleProductResponse
 
 data class SingleProductVIewModelState(
     val loading: Boolean = false,

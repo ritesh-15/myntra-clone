@@ -1,4 +1,4 @@
-package com.example.myntra.data.api
+package com.example.myntra.data.remote.api
 
 class ApiInstance {
 

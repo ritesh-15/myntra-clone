@@ -1,4 +1,4 @@
-package com.example.myntra.data.api.authentication.response
+package com.example.myntra.data.remote.api.authentication.response
 
 data class RegisterResponse(
     val hash: String,

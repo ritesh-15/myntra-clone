@@ -4,11 +4,12 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.room.Room
 import com.example.myntra.common.Constants
-import com.example.myntra.common.utils.TokenHandler
-import com.example.myntra.data.api.ApiInstance
-import com.example.myntra.data.api.authentication.AuthenticationInterface
-import com.example.myntra.data.api.products.ProductInterface
+import com.example.myntra.data.local.MyDatabase
+import com.example.myntra.data.remote.api.ApiInstance
+import com.example.myntra.data.remote.api.authentication.AuthenticationInterface
+import com.example.myntra.data.remote.api.products.ProductInterface
 import com.example.myntra.data.repository.AuthRepositoryImpl
 import com.example.myntra.data.repository.ProductRepositoryImpl
 import com.example.myntra.domain.repository.AuthRepository
@@ -69,6 +70,15 @@ object AppModule {
             .build()
     }
 
+    @Singleton
+    @Provides
+    fun provideLocalDatabase(@ApplicationContext app:Context): MyDatabase {
+        return Room.databaseBuilder(app,
+            MyDatabase::class.java,
+            "myntra_db"
+        ).build()
+    }
+
     @Provides
     @Singleton
     fun provideAuthApi(retrofit: Retrofit): AuthenticationInterface {
@@ -89,7 +99,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideProductRepository(api: ProductInterface): ProductRepository {
-        return ProductRepositoryImpl(api)
+    fun provideProductRepository(api: ProductInterface, db: MyDatabase): ProductRepository {
+        return ProductRepositoryImpl(api, db.productDao)
     }
+
+
 }

@@ -1,7 +1,7 @@
 package com.example.myntra.presentation.categories_screen
 
 
-import com.example.myntra.data.api.products.response.AllCategoriesResponse
+import com.example.myntra.data.remote.api.products.response.AllCategoriesResponse
 
 data class CategoriesViewModelState(
     val loading: Boolean = false,

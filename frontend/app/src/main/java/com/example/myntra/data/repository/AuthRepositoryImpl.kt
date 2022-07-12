@@ -1,8 +1,8 @@
 package com.example.myntra.data.repository
 
-import com.example.myntra.data.api.authentication.AuthenticationInterface
-import com.example.myntra.data.api.authentication.body.*
-import com.example.myntra.data.api.authentication.response.*
+import com.example.myntra.data.remote.api.authentication.AuthenticationInterface
+import com.example.myntra.data.remote.api.authentication.body.*
+import com.example.myntra.data.remote.api.authentication.response.*
 import com.example.myntra.domain.repository.AuthRepository
 import javax.inject.Inject
 

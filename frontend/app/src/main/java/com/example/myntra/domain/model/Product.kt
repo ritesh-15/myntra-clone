@@ -1,5 +1,8 @@
 package com.example.myntra.domain.model
 
+import com.example.myntra.data.local.entity.ProductEntity
+import java.util.*
+
 data class Product(
     val catagory: Catagory,
     val catagoryId: String,
@@ -15,5 +18,25 @@ data class Product(
     val originalPrice: Int,
     val sizes: List<Size>,
     val stock: Int,
-    val updatedAt: String
-)
+    val updatedAt: String,
+) {
+
+    fun toProductEntity(): ProductEntity {
+        return ProductEntity(
+            createdAt,
+            description,
+            discount,
+            discountPrice,
+            fabric,
+            fit,
+            id,
+            name,
+            originalPrice,
+            stock,
+            updatedAt,
+            catagoryId,
+            catagory
+        )
+    }
+
+}

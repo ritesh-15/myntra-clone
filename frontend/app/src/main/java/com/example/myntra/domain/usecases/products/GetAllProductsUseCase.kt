@@ -1,10 +1,8 @@
 package com.example.myntra.domain.usecases.products
 
 import com.example.myntra.common.utils.Resource
-import com.example.myntra.data.api.authentication.body.ActivateBody
-import com.example.myntra.data.api.authentication.response.ActivateAccountResponse
-import com.example.myntra.data.api.products.response.AllProductsResponse
-import com.example.myntra.domain.repository.AuthRepository
+import com.example.myntra.data.remote.api.products.response.AllProductsResponse
+import com.example.myntra.domain.model.Product
 import com.example.myntra.domain.repository.ProductRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,22 +14,8 @@ class GetAllProductsUseCase @Inject constructor(
     private val repository: ProductRepository
 ) {
 
-    operator fun invoke(page:Int = 1, size:Int = 5): Flow<Resource<AllProductsResponse>> {
-        return flow {
-            emit(Resource.Loading())
-
-            try {
-                val response = repository.getAllProducts(page, size)
-                emit(Resource.Success(data = response))
-            }catch (e: HttpException){
-                val message: String =
-                    "Something went wrong!"
-                emit(Resource.Error(message = message, errorBody = e.response()?.errorBody()))
-            }catch (e: IOException){
-                emit(Resource.Error(message = "Couldn't reach to the server please try again!"))
-            }
-
-        }
+    operator fun invoke(page:Int = 1, size:Int = 5): Flow<Resource<List<Product>>> {
+        return repository.getAllProducts(page, size)
     }
 
 }

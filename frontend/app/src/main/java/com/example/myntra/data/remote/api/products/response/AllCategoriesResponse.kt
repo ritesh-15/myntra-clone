@@ -1,4 +1,4 @@
-package com.example.myntra.data.api.products.response
+package com.example.myntra.data.remote.api.products.response
 
 import com.example.myntra.domain.model.Catagory
 

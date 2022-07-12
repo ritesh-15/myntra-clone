@@ -1,9 +1,9 @@
-package com.example.myntra.data.api.products
+package com.example.myntra.data.remote.api.products
 
-import com.example.myntra.data.api.products.response.AllCategoriesResponse
-import com.example.myntra.data.api.products.response.AllProductsResponse
-import com.example.myntra.data.api.products.response.SingleCategoryResponse
-import com.example.myntra.data.api.products.response.SingleProductResponse
+import com.example.myntra.data.remote.api.products.response.AllCategoriesResponse
+import com.example.myntra.data.remote.api.products.response.AllProductsResponse
+import com.example.myntra.data.remote.api.products.response.SingleCategoryResponse
+import com.example.myntra.data.remote.api.products.response.SingleProductResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

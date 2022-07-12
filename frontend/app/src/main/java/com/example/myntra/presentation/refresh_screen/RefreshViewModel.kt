@@ -1,20 +1,14 @@
 package com.example.myntra.presentation.refresh_screen
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myntra.common.Constants
 import com.example.myntra.common.utils.Resource
-import com.example.myntra.data.api.authentication.body.RegisterBody
-import com.example.myntra.data.api.authentication.body.ResendOtpBody
-import com.example.myntra.data.api.authentication.response.ResendOtpResponse
 import com.example.myntra.domain.model.ApiError
 import com.example.myntra.domain.usecases.authentication.RefreshUseCase
-import com.example.myntra.domain.usecases.authentication.RegisterUseCase
-import com.example.myntra.domain.usecases.authentication.ResendOtpUseCase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

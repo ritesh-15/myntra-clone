@@ -1,8 +1,8 @@
 package com.example.myntra.domain.usecases.authentication
 
 import com.example.myntra.common.utils.Resource
-import com.example.myntra.data.api.authentication.body.ResendOtpBody
-import com.example.myntra.data.api.authentication.response.ResendOtpResponse
+import com.example.myntra.data.remote.api.authentication.body.ResendOtpBody
+import com.example.myntra.data.remote.api.authentication.response.ResendOtpResponse
 import com.example.myntra.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

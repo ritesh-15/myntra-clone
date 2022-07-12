@@ -128,7 +128,7 @@ fun HomeScreen(
                 }
             }
 
-            items(state.data?.products ?: emptyList()) { product ->
+            items(state.products ?: emptyList()) { product ->
                 SingleProduct(product = product, navController)
             }
         }

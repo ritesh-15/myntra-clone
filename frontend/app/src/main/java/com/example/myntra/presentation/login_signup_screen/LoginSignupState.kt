@@ -1,6 +1,6 @@
 package com.example.myntra.presentation.login_signup_screen
 
-import com.example.myntra.data.api.authentication.response.ResendOtpResponse
+import com.example.myntra.data.remote.api.authentication.response.ResendOtpResponse
 
 data class LoginSignupState(
     val loading: Boolean = false,

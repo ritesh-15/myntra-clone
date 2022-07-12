@@ -1,4 +1,4 @@
-package com.example.myntra.data.api.authentication.response
+package com.example.myntra.data.remote.api.authentication.response
 
 import com.example.myntra.domain.model.Tokens
 import com.example.myntra.domain.model.User

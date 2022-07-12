@@ -1,7 +1,7 @@
 package com.example.myntra.domain.repository
 
-import com.example.myntra.data.api.authentication.body.*
-import com.example.myntra.data.api.authentication.response.*
+import com.example.myntra.data.remote.api.authentication.body.*
+import com.example.myntra.data.remote.api.authentication.response.*
 
 interface AuthRepository {
 

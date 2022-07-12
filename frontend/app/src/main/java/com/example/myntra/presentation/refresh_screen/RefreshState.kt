@@ -1,6 +1,6 @@
 package com.example.myntra.presentation.refresh_screen
 
-import com.example.myntra.data.api.authentication.response.RefreshResponse
+import com.example.myntra.data.remote.api.authentication.response.RefreshResponse
 
 
 data class RefreshState(
