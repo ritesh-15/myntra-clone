@@ -11,6 +11,7 @@ import {
 import RedisProvider from "../providers/redis_client";
 import { CATEGORIES } from "../constants";
 import { pagination } from "../helper/pagination";
+import { UserInterface } from "../interfaces/UserInterface";
 
 interface CreateProductBody {
   name: string;
@@ -204,6 +205,9 @@ class ProductController {
   ) {
     const { id } = req.params;
     const { refetch } = req.query;
+    let user = req.user;
+
+    console.log(user);
 
     if (!id) return next(HttpError.unporcessableEntity("Id not found!"));
 

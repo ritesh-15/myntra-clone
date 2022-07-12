@@ -12,20 +12,31 @@ datasource db {
 }
 
 model User {
-  id               String    @id @unique @default(cuid())
-  name             String?   @default("") @db.VarChar(255)
-  email            String    @unique
+  id               String     @id @unique @default(cuid())
+  name             String?    @default("") @db.VarChar(255)
+  email            String     @unique
   password         String?
   resetToken       String?
   resetTokenExpiry DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
   phoneNumber      String?
-  isAdmin          Boolean   @default(false)
-  isVerified       Boolean   @default(false)
-  isActive         Boolean   @default(false)
+  isAdmin          Boolean    @default(false)
+  isVerified       Boolean    @default(false)
+  isActive         Boolean    @default(false)
   orders           Order[]
   addresses        Address[]
+  wishList         WishList[]
+}
+
+model WishList {
+  id        String   @id @unique @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Product {
@@ -45,6 +56,7 @@ model Product {
   sizes         Size[]
   fit           String
   OrderProduct  OrderProduct[]
+  wishList      WishList[]
 }
 
 model Image {

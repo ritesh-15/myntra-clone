@@ -13,6 +13,7 @@ import { userRouter } from "./routes/user_router";
 import RedisProvider from "./providers/redis_client";
 import { orderRouter } from "./routes/order_routes";
 import PrismaClientProvider from "./providers/provide_prism_client";
+import { wishListRouter } from "./routes/wishlist_routes";
 
 const app: Application = express();
 
@@ -71,6 +72,7 @@ app.use("/api/v1", authRouter);
 app.use("/api/v1", productRouter);
 app.use("/api/v1", userRouter);
 app.use("/api/v1", orderRouter);
+app.use("/api/v1", wishListRouter);
 
 // passport fail
 app.get("/auth/fail", (req: Request, res: Response, next: NextFunction) => {
