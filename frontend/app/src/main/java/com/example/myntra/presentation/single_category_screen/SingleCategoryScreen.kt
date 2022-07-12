@@ -63,7 +63,7 @@ fun SingleCategoryScreen(
 
     Scaffold(
         topBar = {
-            SingleCategoryTopBar(state.data?.category?.name ?: "")
+            SingleCategoryTopBar(state.category?.name ?: "")
         },
         scaffoldState = scaffoldState,
     ) {
@@ -81,10 +81,11 @@ fun SingleCategoryScreen(
                     strokeWidth = 2.dp,
                     modifier = Modifier
                         .background(Color.White)
-                        .padding(4.dp).clip(CircleShape)
+                        .padding(4.dp)
+                        .clip(CircleShape)
                 )
             }
-        } else if(state.data?.category?.Product?.size == 0){
+        } else if (state.category?.Product?.size == 0) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -94,16 +95,15 @@ fun SingleCategoryScreen(
             ) {
                 Text(text = "No Products Found!", fontFamily = Poppins)
             }
-        }
-        else {
+        } else {
             LazyVerticalGrid(
                 cells = GridCells.Fixed(2),
                 modifier = Modifier
                     .background(Color.White)
                     .padding(bottom = 16.dp),
             ) {
-                items(state.data?.category?.Product ?: emptyList()) { product ->
-                   SingleProduct(product = product, navController)
+                items(state.category?.Product ?: emptyList()) { product ->
+                    SingleProduct(product = product, navController)
                 }
             }
         }

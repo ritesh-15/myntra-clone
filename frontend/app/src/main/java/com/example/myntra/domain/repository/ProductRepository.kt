@@ -2,21 +2,19 @@ package com.example.myntra.domain.repository
 
 import com.example.myntra.common.utils.Resource
 import com.example.myntra.data.local.entity.ProductAndCategoryWithSizeAndImage
-import com.example.myntra.data.remote.api.products.response.AllCategoriesResponse
-import com.example.myntra.data.remote.api.products.response.AllProductsResponse
-import com.example.myntra.data.remote.api.products.response.SingleCategoryResponse
-import com.example.myntra.data.remote.api.products.response.SingleProductResponse
+import com.example.myntra.data.remote.api.products.response.*
+import com.example.myntra.domain.model.Catagory
 import com.example.myntra.domain.model.Product
 import kotlinx.coroutines.flow.Flow
 
 interface ProductRepository {
 
-     fun getAllProducts(page:Int, size:Int):Flow<Resource<List<Product>>>
+    fun getAllProducts(page: Int, size: Int): Flow<Resource<List<Product>>>
 
-    suspend fun getSingleProduct(id:String):SingleProductResponse
+    fun getSingleProduct(id: String): Flow<Resource<Product>>
 
-    suspend fun getAllCategories():AllCategoriesResponse
+     fun getAllCategories(): Flow<Resource<List<Catagory>>>
 
-    suspend fun getSingleCategory(id:String):SingleCategoryResponse
+    fun getSingleCategory(id: String): Flow<Resource<Category>>
 
 }

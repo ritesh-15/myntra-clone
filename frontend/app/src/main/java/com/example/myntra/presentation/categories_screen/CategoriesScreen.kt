@@ -80,7 +80,7 @@ fun CategoriesScreen(
                     .background(Color.White)
                     .padding(4.dp)
             ) {
-                items(state.data?.categories ?: emptyList()) { category ->
+                items(state.categories ?: emptyList()) { category ->
                     SingleCategory(category, navController)
                 }
             }

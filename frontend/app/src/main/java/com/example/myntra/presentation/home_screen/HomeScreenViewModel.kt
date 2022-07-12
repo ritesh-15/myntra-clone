@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.truncate
 
 @HiltViewModel
 class HomeScreenVIewModel @Inject constructor(
@@ -31,7 +32,11 @@ class HomeScreenVIewModel @Inject constructor(
             response.collect {
                 when (it) {
                     is Resource.Loading -> {
-                        _state.value = HomeScreenVIewModelState(loading = true)
+                       if (it.data != null){
+                           _state.value = HomeScreenVIewModelState(loading = false, products = it.data)
+                       }else{
+                           _state.value = HomeScreenVIewModelState(loading = true)
+                       }
                     }
 
                     is Resource.Success -> {

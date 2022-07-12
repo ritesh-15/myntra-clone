@@ -9,12 +9,14 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -59,17 +61,9 @@ fun HomeScreen(
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
-
     // state
     val state = vIewModel.state.value
     val context = LocalContext.current
-
-    if (state.error != null) {
-        LaunchedEffect(Unit) {
-            Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
-        }
-    }
-
 
     // Top bar
     Scaffold(
@@ -78,7 +72,7 @@ fun HomeScreen(
                 scope.launch {
                     scaffoldState.drawerState.open()
                 }
-            })
+            }, navController = navController)
         },
         drawerContent = {
             DrawerHeader(navController = navController, userName = userName)
@@ -100,36 +94,55 @@ fun HomeScreen(
         bottomBar = { AppBottomNavigation(navController = navController) }
     ) {
 
-        LazyVerticalGrid(
-            cells = GridCells.Fixed(2),
-            modifier = Modifier
-                .background(Color.White)
-                .padding(bottom = 50.dp),
-        ) {
-
-            item(span = {
-                GridItemSpan(2)
-            }) {
-                Column {
-                    // image slider
-                    ImageSlider()
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // top picks
-                    TopPicks()
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    //  featured
-                    Featured()
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+        if (state.loading) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(light),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = primary,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier
+                        .background(Color.White)
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                )
             }
+        } else {
+            LazyVerticalGrid(
+                cells = GridCells.Fixed(2),
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(bottom = 50.dp),
+            ) {
 
-            items(state.products ?: emptyList()) { product ->
-                SingleProduct(product = product, navController)
+                item(span = {
+                    GridItemSpan(2)
+                }) {
+                    Column {
+                        // image slider
+                        ImageSlider()
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // top picks
+                        TopPicks()
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        //  featured
+                        Featured()
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
+
+                items(state.products ?: emptyList()) { product ->
+                    SingleProduct(product = product, navController)
+                }
             }
         }
     }
@@ -226,7 +239,6 @@ fun SingleProduct(product: Product, navController: NavController) {
     }
 
 }
-
 
 
 @Composable
@@ -402,6 +414,7 @@ fun ImageSlider() {
 
 @Composable
 fun HomeScreenTopBar(
+    navController: NavController,
     onNavigationIconClick: () -> Unit,
 ) {
     Row(
@@ -468,7 +481,12 @@ fun HomeScreenTopBar(
                 contentDescription = null,
                 modifier = Modifier
                     .width(22.dp)
-                    .height(22.dp),
+                    .height(22.dp)
+                    .clickable {
+                        navController.navigate(
+                            route = Screen.CartScreen.route
+                        )
+                    },
                 contentScale = ContentScale.Fit)
         }
     }

@@ -17,4 +17,16 @@ interface ProductDao {
 
     @Query("SELECT * FROM products")
     suspend fun getAllProducts():List<ProductAndCategoryWithSizeAndImage>
+
+    @Query("SELECT * FROM products WHERE id=:productId")
+    suspend fun getSingleProduct(productId:String):ProductAndCategoryWithSizeAndImage
+
+    @Query("DELETE FROM products WHERE id=:productId")
+    suspend fun deleteProduct(productId:String)
+
+    @Query("DELETE FROM images WHERE productId=:productId")
+    suspend fun deleteAllImages(productId:String)
+
+    @Query("DELETE FROM sizes WHERE productId=:productId")
+    suspend fun deleteAllSizes(productId:String)
 }

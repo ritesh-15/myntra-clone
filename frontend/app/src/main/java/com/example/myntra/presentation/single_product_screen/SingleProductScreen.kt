@@ -30,12 +30,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.myntra.R
 import com.example.myntra.common.bottom_navigation.AppBottomNavigation
+import com.example.myntra.data.local.entity.CartEntity
+import com.example.myntra.domain.model.Cart
 import com.example.myntra.domain.model.Image
+import com.example.myntra.domain.model.Product
 import com.example.myntra.presentation.single_category_screen.SingleCategoryTopBar
 import com.example.myntra.presentation.single_category_screen.SingleCategoryViewModel
 import com.example.myntra.ui.theme.*
@@ -43,6 +47,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import java.util.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -67,12 +72,12 @@ fun SingleProductScreen(
 
     Scaffold(
         topBar = {
-            SingleProductTopBar(state.data?.product?.name ?: "")
+            SingleProductTopBar(state.product?.name ?: "")
         },
         scaffoldState = scaffoldState,
         bottomBar = {
-            if (state.data != null) {
-                SingleProductBottomBar()
+            if (state.product != null) {
+                SingleProductBottomBar(viewModel, state.product)
             }
         }
 
@@ -95,8 +100,8 @@ fun SingleProductScreen(
                         .clip(CircleShape)
                 )
             }
-        } else if (!state.loading && state.data != null) {
-            val product = state.data.product
+        } else if (!state.loading && state.product != null) {
+            val product = state.product
 
             Column(
                 modifier = Modifier
@@ -248,7 +253,7 @@ fun GridItem(title: String, value: String) {
 }
 
 @Composable
-fun SingleProductBottomBar() {
+fun SingleProductBottomBar(viewModel: SingleProductViewModel, product: Product) {
     BottomNavigation(
         backgroundColor = Color.White,
     ) {
@@ -291,11 +296,19 @@ fun SingleProductBottomBar() {
             Button(
                 modifier = Modifier
                     .weight(1f),
-                onClick = {},
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = primary,
                     contentColor = Color.White
-                )
+                ),
+                onClick = {
+                    viewModel.addToCart(
+                        CartEntity(
+                            productId = product.id,
+                            quantity = 1,
+                            id = UUID.randomUUID().toString()
+                        )
+                    )
+                }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

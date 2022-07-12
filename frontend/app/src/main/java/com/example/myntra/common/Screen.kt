@@ -47,4 +47,6 @@ sealed class Screen(
             return "single_product_screen/$id"
         }
     }
+
+    object CartScreen:Screen("cart_screen")
 }

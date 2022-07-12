@@ -1,10 +1,10 @@
 package com.example.myntra.presentation.categories_screen
 
 
-import com.example.myntra.data.remote.api.products.response.AllCategoriesResponse
+import com.example.myntra.domain.model.Catagory
 
 data class CategoriesViewModelState(
     val loading: Boolean = false,
-    val data: AllCategoriesResponse? = null,
+    val categories:List<Catagory>? = emptyList(),
     val error:String? = null
 )

@@ -14,33 +14,41 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SingleCategoryViewModel @Inject constructor(
-    private val getSingleCategoryUseCase: GetSingleCategoryUseCase
+    private val getSingleCategoryUseCase: GetSingleCategoryUseCase,
 ) : ViewModel() {
 
     private val _state = mutableStateOf(SingleCategoryViewModelState())
     val state: State<SingleCategoryViewModelState> = _state
 
-    fun getSingleCategory(id:String) {
+    fun getSingleCategory(id: String) {
         val response = getSingleCategoryUseCase.invoke(id)
 
         viewModelScope.launch {
             response.collect {
                 when (it) {
                     is Resource.Loading -> {
-                        _state.value = SingleCategoryViewModelState(loading = true)
+                        if (it.data != null) {
+                            _state.value =
+                                SingleCategoryViewModelState(loading = false, category = it.data)
+                        } else {
+                            _state.value = SingleCategoryViewModelState(loading = true)
+                        }
                     }
 
                     is Resource.Success -> {
-                        _state.value = SingleCategoryViewModelState(loading = false, data = it.data)
+                        _state.value =
+                            SingleCategoryViewModelState(loading = false, category = it.data)
                     }
 
                     is Resource.Error -> {
                         if (it.errorBody != null) {
                             val error = Gson().fromJson(it.errorBody.string(),
                                 ApiError::class.java)
-                            _state.value = SingleCategoryViewModelState(error = error.message, loading = false)
+                            _state.value =
+                                SingleCategoryViewModelState(error = error.message, loading = false)
                         } else {
-                            _state.value = SingleCategoryViewModelState(loading = false, error = it.message)
+                            _state.value =
+                                SingleCategoryViewModelState(loading = false, error = it.message)
                         }
                     }
                 }

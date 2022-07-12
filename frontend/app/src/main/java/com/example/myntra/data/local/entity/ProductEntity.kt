@@ -5,7 +5,8 @@ import com.example.myntra.domain.model.Catagory
 import com.example.myntra.domain.model.Product
 import java.util.*
 
-@Entity(tableName = "products")
+@Entity(tableName = "products"
+)
 data class ProductEntity(
     val createdAt: String,
     val description: String,

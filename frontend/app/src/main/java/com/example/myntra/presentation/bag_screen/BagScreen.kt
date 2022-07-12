@@ -1,9 +1,11 @@
 package com.example.myntra.presentation.bag_screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -22,10 +24,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.myntra.R
+import com.example.myntra.domain.model.Cart
 import com.example.myntra.domain.model.Product
 import com.example.myntra.presentation.single_category_screen.SingleCategoryTopBar
 import com.example.myntra.ui.theme.Poppins
@@ -34,9 +38,14 @@ import com.example.myntra.ui.theme.primary
 @Composable
 fun BagScreen(
     navController: NavController,
+    viewModel: CartViewModel = hiltViewModel(),
 ) {
     val scaffoldState = rememberScaffoldState()
     val context = LocalContext.current
+
+    val state = viewModel.state.value
+
+    Log.d("cart",state.products.toString())
 
     Scaffold(
         topBar = {
@@ -44,11 +53,11 @@ fun BagScreen(
         },
         scaffoldState = scaffoldState,
     ) {
-        LazyColumn(){
-            items(10){
-                CartProduct(null)
+        LazyColumn() {
+            items(state.products ?: emptyList()) { cart ->
+                CartProduct(cart)
             }
-            item{
+            item {
                 PriceDetails()
             }
         }
@@ -89,7 +98,7 @@ fun PriceDetails() {
 }
 
 @Composable
-fun PriceRow(title:String, value:String) {
+fun PriceRow(title: String, value: String) {
     Row {
         Text(text = title,
             fontSize = 14.sp,
@@ -106,9 +115,7 @@ fun PriceRow(title:String, value:String) {
 }
 
 @Composable
-fun CartProduct(product: Product?) {
-
-    if (product == null) return
+fun CartProduct(cart: Cart) {
 
     Card(
         elevation = 0.dp,
@@ -123,7 +130,7 @@ fun CartProduct(product: Product?) {
         ) {
 
             // image
-            AsyncImage(model = product.images[0], contentDescription = null,
+            AsyncImage(model = cart.product.images[0], contentDescription = null,
                 modifier = Modifier
                     .height(150.dp)
                     .width(100.dp)
@@ -137,7 +144,7 @@ fun CartProduct(product: Product?) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = product.name,
+                    Text(text = cart.product.name,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = Poppins, maxLines = 1,
@@ -149,7 +156,7 @@ fun CartProduct(product: Product?) {
                 }
 
 
-                Text(text = product.description,
+                Text(text = cart.product.description,
                     fontSize = 12.sp,
                     fontFamily = Poppins,
                     overflow = TextOverflow.Ellipsis,
@@ -160,8 +167,8 @@ fun CartProduct(product: Product?) {
                 Row(horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
 
-                    if (product.discount != 0) {
-                        Text(text = "₹ ${product.originalPrice}",
+                    if (cart.product.discount.let { it ?: "" } != 0) {
+                        Text(text = "₹ ${cart.product.originalPrice}",
                             fontSize = 12.sp,
                             fontFamily = Poppins,
                             overflow = TextOverflow.Ellipsis,
@@ -172,10 +179,10 @@ fun CartProduct(product: Product?) {
                         Spacer(modifier = Modifier.width(4.dp))
                     }
 
-                    val price = if (product.discount == 0) {
-                        product.originalPrice.toString()
+                    val price = if (cart.product.discount == 0) {
+                        cart.product.originalPrice.toString()
                     } else {
-                        product.discountPrice.toString()
+                        cart.product.discountPrice.toString()
                     }
 
                     Text(
@@ -187,9 +194,9 @@ fun CartProduct(product: Product?) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 
-                    if (product.discount != 0) {
+                    if (cart.product.discount != 0) {
                         Text(
-                            text = "${product.discount}% off",
+                            text = "${cart.product.discount}% off",
                             fontSize = 12.sp,
                             fontFamily = Poppins,
                             overflow = TextOverflow.Ellipsis,

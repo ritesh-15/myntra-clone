@@ -90,6 +90,10 @@ dependencies {
     // lifecycle
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0"
 
+    // data store
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+
     // dagger hilt
     implementation "com.google.dagger:hilt-android:2.38.1"
     kapt "com.google.dagger:hilt-android-compiler:2.37"

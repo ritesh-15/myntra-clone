@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.myntra.domain.model.User
 import com.example.myntra.presentation.ResetPasswordScreen
+import com.example.myntra.presentation.bag_screen.BagScreen
 import com.example.myntra.presentation.categories_screen.CategoriesScreen
 import com.example.myntra.presentation.complete_sign_up.CompleteSignUpScreen
 import com.example.myntra.presentation.home_screen.HomeScreen
@@ -100,6 +101,10 @@ fun Navigation(navController: NavHostController) {
         ) {
             SingleProductScreen(navController = navController,
                 id = it.arguments?.getString("id") ?: "")
+        }
+
+        composable(route = Screen.CartScreen.route) {
+            BagScreen(navController = navController)
         }
     }
 
