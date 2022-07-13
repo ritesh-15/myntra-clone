@@ -128,6 +128,7 @@ class UserController {
 
   public async getUser(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
+    const { refetch } = req.query;
 
     if (!id) {
       return next(HttpError.unporcessableEntity("Id is required"));
@@ -137,7 +138,7 @@ class UserController {
       // find in cache
       const foundUser = await RedisProvider.getInstance().get(`user-${id}`);
 
-      if (foundUser) {
+      if (foundUser && !refetch) {
         return res.status(200).json({
           ok: true,
           message: "User fetched successfully",
@@ -222,10 +223,6 @@ class UserController {
           name,
           phoneNumber: phoneNumber.toString(),
         },
-        include: {
-          addresses: true,
-          orders: true,
-        },
       });
 
       const sendUser = {
@@ -236,8 +233,6 @@ class UserController {
         isAdmin: updatedUser.isAdmin,
         isVerified: updatedUser.isVerified,
         isActive: updatedUser.isActive,
-        address: updatedUser.addresses,
-        orders: updatedUser.orders,
       };
 
       await RedisProvider.getInstance().del(`user-${id}`);
