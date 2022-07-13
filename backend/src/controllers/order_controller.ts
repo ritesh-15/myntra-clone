@@ -210,6 +210,63 @@ class OrderController {
     }
   }
 
+  // @route GET /api/order/all/user
+  // @desc Get all orders
+  // @access Private
+
+  public async getAllOrdersByUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const user = req.user as UserInterface;
+    const { page, size, query } = req.query;
+
+    const { skip, limit, result } = pagination(
+      page,
+      size,
+      await PrismaClientProvider.get().order.count()
+    );
+
+    try {
+      const orders = await PrismaClientProvider.get().order.findMany({
+        where: {
+          userId: user.id,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phoneNumber: true,
+            },
+          },
+          products: {
+            include: {
+              product: true,
+              size: true,
+            },
+          },
+          extra: true,
+          payment: true,
+          address: true,
+        },
+        skip: skip,
+        take: limit,
+      });
+
+      res.status(200).json({
+        message: "Orders fetched successfully",
+        ok: true,
+        orders,
+        result,
+      });
+    } catch (error) {
+      return next(HttpError.internalServerError("Internal server error"));
+    }
+  }
+
   // @route DELETE /api/order/:id
   // @desc Delete order
   // @access Private

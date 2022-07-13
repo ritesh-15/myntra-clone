@@ -8,6 +8,10 @@ const router: Router = Router();
 router.route("/order/create").post(authenticate, orderController.createOrder);
 
 router
+  .route("/order/all/user")
+  .get(authenticate, orderController.getAllOrdersByUser);
+
+router
   .route("/order/all")
   .get([authenticate, isAdmin], orderController.getAllOrders);
 
