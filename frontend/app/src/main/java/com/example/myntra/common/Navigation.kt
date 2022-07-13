@@ -12,13 +12,16 @@ import com.example.myntra.presentation.ResetPasswordScreen
 import com.example.myntra.presentation.bag_screen.BagScreen
 import com.example.myntra.presentation.categories_screen.CategoriesScreen
 import com.example.myntra.presentation.complete_sign_up.CompleteSignUpScreen
+import com.example.myntra.presentation.explorer_screen.ExplorerScreen
 import com.example.myntra.presentation.home_screen.HomeScreen
 import com.example.myntra.presentation.link_create_account_screen.LinkCreateAccountScreen
 import com.example.myntra.presentation.login_screen.LoginScreen
 import com.example.myntra.presentation.login_signup_screen.LoginSignUpScreen
+import com.example.myntra.presentation.profile_screen.ProfileScreen
 import com.example.myntra.presentation.refresh_screen.RefreshScreen
 import com.example.myntra.presentation.single_category_screen.SingleCategoryScreen
 import com.example.myntra.presentation.single_product_screen.SingleProductScreen
+import com.example.myntra.presentation.update_profile_screen.UpdateProfileScreen
 import com.example.myntra.presentation.verify_otp_screen.VerifyOtpScreen
 import com.google.gson.Gson
 
@@ -35,7 +38,7 @@ fun Navigation(navController: NavHostController) {
         ) {
             HomeScreen(navController = navController,
                 userName = it.arguments?.getString("userName")
-                )
+            )
         }
 
         composable(route = Screen.LoginSignUp.route) {
@@ -84,17 +87,18 @@ fun Navigation(navController: NavHostController) {
 
         composable(route = Screen.SingleCategoryScreen.route,
             arguments = listOf(
-                navArgument("id"){
+                navArgument("id") {
                     type = NavType.StringType
                 }
             )
-            ) {
-            SingleCategoryScreen(navController = navController, id =  it.arguments?.getString("id") ?: "")
+        ) {
+            SingleCategoryScreen(navController = navController,
+                id = it.arguments?.getString("id") ?: "")
         }
 
         composable(route = Screen.SingleProductScreen.route,
             arguments = listOf(
-                navArgument("id"){
+                navArgument("id") {
                     type = NavType.StringType
                 }
             )
@@ -105,6 +109,18 @@ fun Navigation(navController: NavHostController) {
 
         composable(route = Screen.CartScreen.route) {
             BagScreen(navController = navController)
+        }
+
+        composable(route = Screen.Profile.route) {
+            ProfileScreen(navController = navController)
+        }
+
+        composable(route = Screen.UpdateProfileScreen.route) {
+            UpdateProfileScreen(navController = navController)
+        }
+
+        composable(route = Screen.Explore.route) {
+            ExplorerScreen(navController)
         }
     }
 

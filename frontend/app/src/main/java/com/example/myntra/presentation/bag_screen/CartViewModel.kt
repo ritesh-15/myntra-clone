@@ -7,22 +7,40 @@ import androidx.lifecycle.viewModelScope
 import com.example.myntra.common.utils.Resource
 import com.example.myntra.domain.model.ApiError
 import com.example.myntra.domain.usecases.cart.GetAllCartProducts
+import com.example.myntra.domain.usecases.cart.RemoveFromCartUseCase
+import com.example.myntra.domain.usecases.cart.RemoveFromCartUseCase_Factory
 import com.example.myntra.domain.usecases.products.GetAllCategoriesUseCase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val getAllCartProducts: GetAllCartProducts
+    private val getAllCartProducts: GetAllCartProducts,
+    private val removeFromCartUseCase: RemoveFromCartUseCase,
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(CartViewModelState())
-    val state: State<CartViewModelState> = _state
+    private val _state = MutableStateFlow(CartViewModelState())
+    val state: StateFlow<CartViewModelState> = _state
 
     init {
         getAllCartProducts()
+    }
+
+    fun removeFromCart(productId: String) {
+        viewModelScope.launch {
+            removeFromCartUseCase.invoke(productId).collect {
+                when (it) {
+                    is Resource.Success -> {
+                        _state.value = CartViewModelState(removeFromCart = productId)
+                    }
+                }
+            }
+        }
     }
 
     fun getAllCartProducts() {
@@ -33,9 +51,9 @@ class CartViewModel @Inject constructor(
             response.collect {
                 when (it) {
                     is Resource.Loading -> {
-                        if (it.data != null){
+                        if (it.data != null) {
                             _state.value = CartViewModelState(loading = false, products = it.data)
-                        }else{
+                        } else {
                             _state.value = CartViewModelState(loading = true)
                         }
                     }
@@ -48,7 +66,8 @@ class CartViewModel @Inject constructor(
                         if (it.errorBody != null) {
                             val error = Gson().fromJson(it.errorBody.string(),
                                 ApiError::class.java)
-                            _state.value = CartViewModelState(error = error.message, loading = false)
+                            _state.value =
+                                CartViewModelState(error = error.message, loading = false)
                         } else {
                             _state.value = CartViewModelState(loading = false, error = it.message)
                         }

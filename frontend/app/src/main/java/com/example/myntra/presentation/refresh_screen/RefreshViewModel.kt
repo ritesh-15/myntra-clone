@@ -8,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.myntra.common.Constants
 import com.example.myntra.common.utils.Resource
 import com.example.myntra.domain.model.ApiError
+import com.example.myntra.domain.model.User
 import com.example.myntra.domain.usecases.authentication.RefreshUseCase
+import com.example.myntra.domain.usecases.user.InsertUserUseCase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,6 +20,7 @@ import javax.inject.Inject
 class RefreshViewModel @Inject constructor(
     private val refreshUseCase: RefreshUseCase,
     private val pref: SharedPreferences,
+    private val insertUserUseCase: InsertUserUseCase,
 ) : ViewModel() {
 
     private val _state = mutableStateOf(RefreshState())
@@ -25,6 +28,18 @@ class RefreshViewModel @Inject constructor(
 
     init {
         refresh()
+    }
+
+    private fun storeIntoCache(user: User) {
+        viewModelScope.launch {
+            insertUserUseCase.invoke(user).collect {
+                when (it) {
+                    is Resource.Success -> {
+                        // TODO
+                    }
+                }
+            }
+        }
     }
 
     fun refresh() {
@@ -44,6 +59,10 @@ class RefreshViewModel @Inject constructor(
                             putString(Constants.ACCESS_TOKEN, it.data?.tokens?.accessToken)
                             putString(Constants.REFRESH_TOKEN, it.data?.tokens?.refreshToken)
                             apply()
+                        }
+
+                        if (it.data != null) {
+                            storeIntoCache(it.data.user)
                         }
 
                         _state.value = RefreshState(loading = false, data = it.data)

@@ -39,4 +39,11 @@ class CartRepositoryImpl(
             emit(Resource.Success())
         }
     }
+
+    override fun findCartProduct(productId: String): Flow<Resource<Cart>> {
+        return flow {
+            val product = dao.findCartProduct(productId)
+            emit(Resource.Success(data = product?.toCart() ?: null))
+        }
+    }
 }

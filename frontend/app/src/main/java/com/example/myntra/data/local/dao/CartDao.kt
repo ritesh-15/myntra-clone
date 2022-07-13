@@ -14,6 +14,9 @@ interface CartDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addToCart(product: CartEntity)
 
+    @Query("SELECT * FROM cart WHERE id=:productId")
+    suspend fun findCartProduct(productId: String): CartWithProduct?
+
     @Query("SELECT * FROM cart")
     suspend fun getCartProducts(): List<CartWithProduct>
 
@@ -21,5 +24,5 @@ interface CartDao {
     suspend fun removeFromCart(cartId: String)
 
     @Query("UPDATE cart SET quantity=:quantity WHERE id=:cartId")
-    suspend fun updateQuantity(cartId: String, quantity: Int):Unit
+    suspend fun updateQuantity(cartId: String, quantity: Int): Unit
 }

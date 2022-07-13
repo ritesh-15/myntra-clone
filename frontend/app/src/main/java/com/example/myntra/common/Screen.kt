@@ -49,4 +49,8 @@ sealed class Screen(
     }
 
     object CartScreen:Screen("cart_screen")
+
+    object ProfileScreen:Screen("profile_screen")
+
+    object UpdateProfileScreen:Screen("update_profile_screen")
 }

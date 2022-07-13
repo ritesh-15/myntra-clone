@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.myntra.common.utils.Resource
 import com.example.myntra.data.remote.api.authentication.body.ActivateBody
 import com.example.myntra.domain.model.ApiError
+import com.example.myntra.domain.model.User
 import com.example.myntra.domain.usecases.authentication.ActivateAccountUseCase
+import com.example.myntra.domain.usecases.user.InsertUserUseCase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -15,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ActivateAccountViewModel @Inject constructor(
-    private val activateAccountUseCase: ActivateAccountUseCase
+    private val activateAccountUseCase: ActivateAccountUseCase,
+    private val insertUserUseCase: InsertUserUseCase
 ) : ViewModel() {
 
     private val _state = mutableStateOf(ActivateAccountState())
@@ -35,6 +38,18 @@ class ActivateAccountViewModel @Inject constructor(
 
     fun onPhoneNumberChange(it:String){
         phoneNumber.value = it
+    }
+
+    private fun storeIntoCache(user: User) {
+        viewModelScope.launch {
+            insertUserUseCase.invoke(user).collect {
+                when(it){
+                    is Resource.Success -> {
+                        // TODO
+                    }
+                }
+            }
+        }
     }
 
 
@@ -65,6 +80,11 @@ class ActivateAccountViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
+
+                        if (it.data != null){
+                            storeIntoCache(it.data.user)
+                        }
+
                         _state.value = ActivateAccountState(loading = false, data = it.data)
                     }
 

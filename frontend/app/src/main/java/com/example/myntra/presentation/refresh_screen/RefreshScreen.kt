@@ -28,11 +28,9 @@ fun RefreshScreen(
 ) {
 
     val state = viewModel.state.value
-    val context = LocalContext.current
 
     if (state.error != null) {
         LaunchedEffect(Unit) {
-            Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
             navController.navigate(Screen.Home.route) {
                 popUpTo(Screen.Splash.route) {
                     inclusive = true
@@ -63,8 +61,8 @@ fun RefreshScreen(
         Image(painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = null,
             modifier = Modifier
-                .width(50.dp)
-                .height(50.dp))
+                .width(75.dp)
+                .height(75.dp))
 
         Spacer(modifier = Modifier.height(16.dp))
 

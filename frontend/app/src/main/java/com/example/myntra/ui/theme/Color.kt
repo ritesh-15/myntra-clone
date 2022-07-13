@@ -13,3 +13,8 @@ val secondary = Color(0xFF29303E)
 val light = Color(0xFFF6F6F6)
 val dotLight = Color(0xFFD4D4D4)
 val red = Color(0xFFFF2222)
+
+val blue = Color(0xFF87D8FF)
+val pink = Color(0xFFFF91B9)
+val green = Color(0xFFAEFFB1)
+val yellow = Color(0xFFFFEFA9)

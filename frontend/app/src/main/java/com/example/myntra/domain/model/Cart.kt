@@ -8,12 +8,14 @@ data class Cart(
     val id: String = "",
     val quantity: Int,
     val product: Product,
+    val size:Size
 ) {
     fun toCartEntity(): CartEntity {
         return CartEntity(
             id = UUID.randomUUID().toString(),
             productId = productId,
-            quantity = quantity
+            quantity = quantity,
+            size = size
         )
     }
 }

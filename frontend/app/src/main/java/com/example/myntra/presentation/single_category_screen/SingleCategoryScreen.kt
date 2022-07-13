@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -63,7 +65,7 @@ fun SingleCategoryScreen(
 
     Scaffold(
         topBar = {
-            SingleCategoryTopBar(state.category?.name ?: "")
+            SingleCategoryTopBar(state.category?.name ?: "", navController)
         },
         scaffoldState = scaffoldState,
     ) {
@@ -204,7 +206,7 @@ fun SingleProduct(product: Product, navController: NavController) {
 
 
 @Composable
-fun SingleCategoryTopBar(categoryName: String) {
+fun SingleCategoryTopBar(categoryName: String, navController: NavController) {
     TopAppBar(
         backgroundColor = Color.White,
         elevation = 0.dp, title = {
@@ -216,7 +218,11 @@ fun SingleCategoryTopBar(categoryName: String) {
                     .width(22.dp)
                     .height(22.dp),
                 contentScale = ContentScale.Fit)
-        })
+        }, navigationIcon = ({
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+            }
+        }))
 }
 
 @Preview(showBackground = true)

@@ -1,9 +1,7 @@
 package com.example.myntra.presentation.categories_screen
 
 import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +18,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,10 +33,7 @@ import com.example.myntra.common.nav_drawer.DrawerHeader
 import com.example.myntra.common.nav_drawer.NavDrawerItem
 import com.example.myntra.domain.model.Catagory
 import com.example.myntra.presentation.home_screen.HomeScreenTopBar
-import com.example.myntra.ui.theme.Poppins
-import com.example.myntra.ui.theme.Shapes
-import com.example.myntra.ui.theme.light
-import com.example.myntra.ui.theme.primary
+import com.example.myntra.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,6 +44,8 @@ fun CategoriesScreen(
 
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
+
+    val colors = listOf(blue, green, yellow, pink)
 
     Scaffold(
         topBar = {
@@ -71,16 +69,18 @@ fun CategoriesScreen(
                     strokeWidth = 2.dp,
                     modifier = Modifier
                         .background(Color.White)
-                        .padding(4.dp).clip(CircleShape)
+                        .padding(4.dp)
+                        .clip(CircleShape)
                 )
             }
-        }else{
+        } else {
             LazyColumn(
                 modifier = Modifier
                     .background(Color.White)
-                    .padding(4.dp)
+                    .padding(16.dp)
             ) {
                 items(state.categories ?: emptyList()) { category ->
+                    val randomColor = colors.random()
                     SingleCategory(category, navController)
                 }
             }
@@ -89,24 +89,34 @@ fun CategoriesScreen(
 }
 
 @Composable
-fun SingleCategory(category: Catagory, navController: NavController) {
+fun SingleCategory(
+    category: Catagory,
+    navController: NavController,
+) {
     Column(
         modifier = Modifier
             .clickable {
-                navController.navigate(Screen.SingleCategoryScreen.passId(category.id))
+                navController
+                    .navigate(Screen.SingleCategoryScreen.passId(category.id))
             }
             .background(Color.White)
             .fillMaxWidth()
-            .border(width = 1.dp,
-                Color.LightGray,
-                shape = Shapes.small)
+            .border(
+                width = 1.dp,
+                color = Color.LightGray,
+                shape = Shapes.medium
+            )
             .padding(16.dp)
+            .clip(Shapes.medium),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = category.name,
             fontSize = 16.sp,
             fontFamily = Poppins,
-        )
+
+            )
     }
 
     Spacer(modifier = Modifier.height(12.dp))

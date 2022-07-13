@@ -18,13 +18,17 @@ import com.example.myntra.common.Constants
 import com.example.myntra.data.local.MyDatabase
 import com.example.myntra.data.remote.api.ApiInstance
 import com.example.myntra.data.remote.api.authentication.AuthenticationInterface
+import com.example.myntra.data.remote.api.order.OrderApiInterface
 import com.example.myntra.data.remote.api.products.ProductInterface
+import com.example.myntra.data.remote.api.user.UserApiInterface
 import com.example.myntra.data.repository.AuthRepositoryImpl
 import com.example.myntra.data.repository.CartRepositoryImpl
 import com.example.myntra.data.repository.ProductRepositoryImpl
+import com.example.myntra.data.repository.UserRepositoryImpl
 import com.example.myntra.domain.repository.AuthRepository
 import com.example.myntra.domain.repository.CartRepository
 import com.example.myntra.domain.repository.ProductRepository
+import com.example.myntra.domain.repository.UserRepository
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -53,7 +57,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(@ApplicationContext context: Context, pref: SharedPreferences): Retrofit {
+    fun provideRetrofit( pref: SharedPreferences): Retrofit {
         val json = GsonBuilder()
             .setLenient()
             .create()
@@ -61,9 +65,6 @@ object AppModule {
         val headersInterceptor = Interceptor { chain ->
             val accessToken = pref.getString(Constants.ACCESS_TOKEN, null)
             val refreshToken = pref.getString(Constants.REFRESH_TOKEN, null)
-
-            Log.d("ACCESS_TOKEN", accessToken ?: "null")
-            Log.d("REFRESH_TOKEN", refreshToken ?: "null")
 
             val request = chain.request().newBuilder()
                 .addHeader(Constants.AUTHORIZATION, "Bearer ${accessToken ?: ""}")
@@ -101,6 +102,18 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideUserApi(retrofit: Retrofit): UserApiInterface {
+        return retrofit.create(UserApiInterface::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrderApi(retrofit: Retrofit): OrderApiInterface {
+        return retrofit.create(OrderApiInterface::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideAuthRepository(api: AuthenticationInterface): AuthRepository {
         return AuthRepositoryImpl(api)
     }
@@ -115,6 +128,12 @@ object AppModule {
     @Singleton
     fun provideCartRepository(db: MyDatabase): CartRepository {
         return CartRepositoryImpl(db.cartDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(api: UserApiInterface, db: MyDatabase): UserRepository {
+        return UserRepositoryImpl(api = api, dao = db.userDao)
     }
 
     @Provides

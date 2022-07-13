@@ -5,6 +5,7 @@ import com.example.myntra.domain.model.Cart
 
 data class CartViewModelState(
     val loading: Boolean = false,
-    val products:List<Cart>? = emptyList(),
-    val error:String? = null
+    val products: List<Cart>? = emptyList(),
+    val error: String? = null,
+    val removeFromCart: String? = null,
 )

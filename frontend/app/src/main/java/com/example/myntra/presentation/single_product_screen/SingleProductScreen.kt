@@ -1,6 +1,7 @@
 package com.example.myntra.presentation.single_product_screen
 
 import android.hardware.lights.Light
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -8,12 +9,14 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
+import androidx.compose.runtime.internal.illegalDecoyCallException
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +25,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -35,11 +39,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.myntra.R
+import com.example.myntra.common.Screen
 import com.example.myntra.common.bottom_navigation.AppBottomNavigation
 import com.example.myntra.data.local.entity.CartEntity
 import com.example.myntra.domain.model.Cart
 import com.example.myntra.domain.model.Image
 import com.example.myntra.domain.model.Product
+import com.example.myntra.domain.model.Size
 import com.example.myntra.presentation.single_category_screen.SingleCategoryTopBar
 import com.example.myntra.presentation.single_category_screen.SingleCategoryViewModel
 import com.example.myntra.ui.theme.*
@@ -49,7 +55,6 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import java.util.*
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SingleProductScreen(
     navController: NavController,
@@ -61,6 +66,11 @@ fun SingleProductScreen(
 
     val state = viewModel.state.value
 
+    val selectedSize: MutableState<Size?> = remember {
+        mutableStateOf(null)
+    }
+
+
     if (state.error != null) {
         Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
         navController.popBackStack()
@@ -68,16 +78,17 @@ fun SingleProductScreen(
 
     LaunchedEffect(id, viewModel) {
         viewModel.getSingleProduct(id)
+        viewModel.findCartProduct(id)
     }
 
     Scaffold(
         topBar = {
-            SingleProductTopBar(state.product?.name ?: "")
+            SingleProductTopBar(state.product?.name ?: "", navController)
         },
         scaffoldState = scaffoldState,
         bottomBar = {
             if (state.product != null) {
-                SingleProductBottomBar(viewModel, state.product)
+                SingleProductBottomBar(viewModel, state.product, selectedSize.value, navController)
             }
         }
 
@@ -194,16 +205,25 @@ fun SingleProductScreen(
                         items(product.sizes) { size ->
                             Box(
                                 modifier = Modifier
-                                    .width(35.dp)
-                                    .height(35.dp)
+                                    .width(40.dp)
+                                    .height(40.dp)
                                     .border(
                                         width = 1.dp,
-                                        color = Color.LightGray,
+                                        color = if (size.id == selectedSize.value?.id) primary else Color.LightGray,
                                         shape = CircleShape
+                                    )
+                                    .selectable(
+                                        selected = size.id == selectedSize.value?.id,
+                                        onClick = {
+                                            selectedSize.value = size
+                                        },
+                                        role = Role.RadioButton
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = size.title, fontFamily = Poppins)
+                                Text(text = size.title, fontFamily = Poppins,
+                                    color = if (size.id == selectedSize.value?.id) primary else Color.LightGray
+                                )
                             }
 
                             Spacer(modifier = Modifier.width(8.dp))
@@ -253,7 +273,33 @@ fun GridItem(title: String, value: String) {
 }
 
 @Composable
-fun SingleProductBottomBar(viewModel: SingleProductViewModel, product: Product) {
+fun SingleProductBottomBar(
+    viewModel: SingleProductViewModel,
+    product: Product,
+    selectedSize: Size?,
+    navController: NavController,
+) {
+
+    val context = LocalContext.current
+
+    fun addToCart() {
+        if (selectedSize == null) {
+            Toast.makeText(context, "Size is not choosen!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        viewModel.addToCart(
+            cart = CartEntity(
+                id = product.id,
+                productId = product.id,
+                size = selectedSize,
+                quantity = 1
+            )
+        )
+
+        viewModel.findCartProduct(product.id)
+    }
+
     BottomNavigation(
         backgroundColor = Color.White,
     ) {
@@ -301,13 +347,11 @@ fun SingleProductBottomBar(viewModel: SingleProductViewModel, product: Product) 
                     contentColor = Color.White
                 ),
                 onClick = {
-                    viewModel.addToCart(
-                        CartEntity(
-                            productId = product.id,
-                            quantity = 1,
-                            id = UUID.randomUUID().toString()
-                        )
-                    )
+                    if (viewModel.cartProduct.value != null) {
+                        navController.navigate(Screen.CartScreen.route)
+                    } else {
+                        addToCart()
+                    }
                 }
             ) {
                 Row(
@@ -322,7 +366,11 @@ fun SingleProductBottomBar(viewModel: SingleProductViewModel, product: Product) 
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    Text(text = "add to bag".uppercase(), fontFamily = Poppins)
+                    if (viewModel.cartProduct.value != null) {
+                        Text(text = "go to bag".uppercase(), fontFamily = Poppins)
+                    } else {
+                        Text(text = "add to bag".uppercase(), fontFamily = Poppins)
+                    }
                 }
             }
         }
@@ -331,11 +379,13 @@ fun SingleProductBottomBar(viewModel: SingleProductViewModel, product: Product) 
 
 
 @Composable
-fun SingleProductTopBar(productName: String) {
+fun SingleProductTopBar(productName: String, navController: NavController) {
     TopAppBar(
         backgroundColor = Color.White,
         navigationIcon = {
-            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+            }
         },
         elevation = 0.dp, title = {
             Text(text = productName, fontFamily = Poppins)

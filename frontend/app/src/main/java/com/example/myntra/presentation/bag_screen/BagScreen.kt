@@ -1,16 +1,19 @@
 package com.example.myntra.presentation.bag_screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +21,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,8 +35,8 @@ import coil.compose.AsyncImage
 import com.example.myntra.R
 import com.example.myntra.domain.model.Cart
 import com.example.myntra.domain.model.Product
-import com.example.myntra.presentation.single_category_screen.SingleCategoryTopBar
 import com.example.myntra.ui.theme.Poppins
+import com.example.myntra.ui.theme.light
 import com.example.myntra.ui.theme.primary
 
 @Composable
@@ -42,31 +46,147 @@ fun BagScreen(
 ) {
     val scaffoldState = rememberScaffoldState()
     val context = LocalContext.current
+    val state = viewModel.state.collectAsState().value
 
-    val state = viewModel.state.value
+    val discount = remember {
+        mutableStateOf(0)
+    }
 
-    Log.d("cart",state.products.toString())
+    val total = remember {
+        mutableStateOf(0)
+    }
+
+    val totalAmount = remember {
+        mutableStateOf(0)
+    }
+
+    fun calculatePrice() {
+        val products = viewModel.state.value.products
+        discount.value = 0;
+        total.value = 0;
+        totalAmount.value = 0
+
+        products?.map { it ->
+            discount.value += (it.product.originalPrice - it.product.discountPrice) * it.quantity
+            total.value += it.product.originalPrice * it.quantity
+            totalAmount.value += if (it.product.discount == 0)
+                it.product.originalPrice * it.quantity
+            else it.product.discountPrice * it.quantity
+        }
+
+    }
+
+    fun removeFromCart(product: Product) {
+        viewModel.removeFromCart(product.id)
+    }
+
+    LaunchedEffect(state.products) {
+        calculatePrice()
+    }
+
 
     Scaffold(
         topBar = {
-            BagScreenTopBar()
+            BagScreenTopBar(navController)
         },
         scaffoldState = scaffoldState,
+        bottomBar = {
+            if (state.products?.size != 0) {
+                BagScreenBottomBar()
+            }
+        }
     ) {
-        LazyColumn() {
-            items(state.products ?: emptyList()) { cart ->
-                CartProduct(cart)
+        if (state.products?.size != 0) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .background(light)
+                    .padding(bottom = 50.dp)
+            ) {
+                items(state.products ?: emptyList()) { cart ->
+                    CartProduct(cart,
+                        viewModel,
+                        removeFromCart = { it -> removeFromCart(it) },
+                        calculatePrice = {})
+                }
+
+                item {
+                    PriceDetails(total.value, totalAmount.value, discount.value)
+                }
             }
-            item {
-                PriceDetails()
-            }
+        } else {
+            EmptyCart()
         }
     }
 }
 
 @Composable
-fun PriceDetails() {
-    Column {
+fun EmptyCart() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(painter = painterResource(id = R.drawable.ic_empty_cart),
+            contentDescription = null,
+            modifier = Modifier.height(150.dp),
+            contentScale = ContentScale.Crop)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = "Cart Is Empty!",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = Poppins)
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(text = "Start shopping by adding product to cart",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Light,
+            fontFamily = Poppins)
+    }
+}
+
+@Composable
+fun BagScreenBottomBar() {
+    BottomNavigation(
+        backgroundColor = Color.White,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+                .background(Color.White),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = primary,
+                    contentColor = Color.White
+                ),
+                onClick = {
+
+                },
+                elevation = ButtonDefaults.elevation(0.dp),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                Text(text = "place order".uppercase(), fontFamily = Poppins)
+            }
+        }
+
+    }
+}
+
+@Composable
+fun PriceDetails(total: Int, totalAmount: Int, discount: Int) {
+    Column(
+        modifier = Modifier
+            .background(Color.White)
+            .padding(12.dp)
+    ) {
         Text(text = "Price Details (1 Items)",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
@@ -75,20 +195,24 @@ fun PriceDetails() {
         Divider()
         Spacer(modifier = Modifier.height(8.dp))
 
-        PriceRow("Total MRP", "1499")
-        PriceRow("Discount on MRP", "874")
+        PriceRow("Total MRP", "₹ $total")
+        PriceRow("Discount on MRP", "₹ $discount")
         Spacer(modifier = Modifier.height(4.dp))
         Divider()
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(text = "Total Amount",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = Poppins, maxLines = 1,
                 overflow = TextOverflow.Ellipsis)
 
-            Text(text = "524",
+            Text(text = "₹ $totalAmount",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = Poppins, maxLines = 1,
@@ -99,7 +223,10 @@ fun PriceDetails() {
 
 @Composable
 fun PriceRow(title: String, value: String) {
-    Row {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         Text(text = title,
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
@@ -115,14 +242,20 @@ fun PriceRow(title: String, value: String) {
 }
 
 @Composable
-fun CartProduct(cart: Cart) {
-
+fun CartProduct(
+    cart: Cart,
+    viewModel: CartViewModel,
+    calculatePrice: () -> Unit,
+    removeFromCart: (product: Product) -> Unit,
+) {
     Card(
         elevation = 0.dp,
         shape = RectangleShape,
         backgroundColor = Color.White,
         modifier = Modifier
-            .padding(8.dp)
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(12.dp)
     ) {
         Row(
             modifier = Modifier
@@ -130,19 +263,20 @@ fun CartProduct(cart: Cart) {
         ) {
 
             // image
-            AsyncImage(model = cart.product.images[0], contentDescription = null,
+            AsyncImage(model = cart.product.images[0].url, contentDescription = null,
                 modifier = Modifier
                     .height(150.dp)
                     .width(100.dp)
             )
 
             Column(
-
+                modifier = Modifier.padding(horizontal = 8.dp)
             ) {
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = cart.product.name,
                         fontSize = 14.sp,
@@ -150,7 +284,10 @@ fun CartProduct(cart: Cart) {
                         fontFamily = Poppins, maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
 
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        removeFromCart(cart.product)
+                        viewModel.getAllCartProducts()
+                    }) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = null)
                     }
                 }
@@ -206,28 +343,41 @@ fun CartProduct(cart: Cart) {
                     }
 
                 }
+
             }
 
         }
     }
 
+    Spacer(modifier = Modifier.height(16.dp))
+
 }
 
+
 @Composable
-fun BagScreenTopBar() {
+fun BagScreenTopBar(navController: NavController) {
     TopAppBar(
         backgroundColor = Color.White,
         elevation = 0.dp, title = {
             Text(text = "Shopping Cart", fontFamily = Poppins)
-        }, actions = {
+        },
+        actions = {
             Image(painter = painterResource(id = R.drawable.ic_like),
                 contentDescription = null,
                 modifier = Modifier
                     .width(22.dp)
                     .height(22.dp),
                 contentScale = ContentScale.Fit)
-        }, modifier = Modifier.padding(horizontal = 8.dp), navigationIcon = ({
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+        },
+        modifier = Modifier.padding(horizontal = 8.dp),
+        navigationIcon = ({
+            IconButton(
+                onClick = {
+                    navController.popBackStack()
+                }
+            ) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+            }
         }))
 }
 
