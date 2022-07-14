@@ -264,7 +264,7 @@ class UserController {
     try {
       requestData = await addressSchema.validateAsync(req.body);
     } catch (error: any) {
-      return next(HttpError.unporcessableEntity(error.details));
+      return next(HttpError.unporcessableEntity("Unprocesseble entity!"));
     }
 
     const { address, city, nearestLandmark, phoneNumber, state, pinCode } =

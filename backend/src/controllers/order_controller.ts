@@ -56,7 +56,7 @@ class OrderController {
       });
 
       // create extra order details
-      const extra = await PrismaClientProvider.get().extraOrderInfo.create({
+      await PrismaClientProvider.get().extraOrderInfo.create({
         data: {
           orderStatus: "pending",
           deliveryCost: 0,
@@ -72,7 +72,7 @@ class OrderController {
       });
 
       // create payment
-      const paymentId = await PrismaClientProvider.get().payment.create({
+      await PrismaClientProvider.get().payment.create({
         data: {
           total: payment.total,
           discount: payment.discount,
@@ -84,15 +84,14 @@ class OrderController {
       // create order products
       await Promise.all(
         products.map(async (product) => {
-          const productData =
-            await PrismaClientProvider.get().orderProduct.create({
-              data: {
-                quantity: product.quantity,
-                sizeId: product.sizeId,
-                productId: product.productId,
-                orderId: order.id,
-              },
-            });
+          await PrismaClientProvider.get().orderProduct.create({
+            data: {
+              quantity: product.quantity,
+              sizeId: product.sizeId,
+              productId: product.productId,
+              orderId: order.id,
+            },
+          });
         })
       );
 
