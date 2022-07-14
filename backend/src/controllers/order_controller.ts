@@ -116,6 +116,8 @@ class OrderController {
     const { payload, event } = req.body;
     const paymentDetails = payload.payment.entity;
 
+    console.log(paymentDetails);
+
     try {
       const foundPayment = await PrismaClientProvider.get().payment.findFirst({
         where: {
