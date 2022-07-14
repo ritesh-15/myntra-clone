@@ -127,15 +127,18 @@ model ExtraOrderInfo {
 }
 
 model Payment {
-  id            String   @id @default(cuid())
-  total         Int
-  discount      Int      @default(0)
-  paymentType   String
-  paymentStatus Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  orderId       String
-  Order         Order    @relation(fields: [orderId], references: [id])
+  id                String   @id @default(cuid())
+  total             Int
+  discount          Int      @default(0)
+  paymentType       String
+  paymentStatus     Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  orderId           String
+  razorPayPaymentId String?
+  razorPayOrderId   String?
+  razorPaySignature String?
+  Order             Order    @relation(fields: [orderId], references: [id])
 }
 
 model Address {

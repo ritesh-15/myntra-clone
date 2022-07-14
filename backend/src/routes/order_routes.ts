@@ -12,6 +12,10 @@ router
   .get(authenticate, orderController.getAllOrdersByUser);
 
 router
+  .route("/order/confirm/payment")
+  .post(authenticate, orderController.confirmPayment);
+
+router
   .route("/order/all")
   .get([authenticate, isAdmin], orderController.getAllOrders);
 

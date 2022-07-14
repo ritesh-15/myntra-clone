@@ -7,6 +7,7 @@ export const createOrderSchema = Joi.object({
         quantity: Joi.number().required(),
         productId: Joi.string().required(),
         sizeId: Joi.string().required(),
+        razorPayOrderId: Joi.string(),
       }).required()
     )
     .required(),

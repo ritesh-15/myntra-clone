@@ -8,11 +8,13 @@ import RedisProvider from "../providers/redis_client";
 import { createOrderSchema } from "../validation/order";
 import Razorpay from "razorpay";
 import { RAZORPAY_API_KEY, RAZORPAY_KEY_SECRET } from "../keys/secrets";
+import crypto from "crypto";
 
 interface CreateOrder {
   products: Product[];
   addressId: string;
   payment: Payment;
+  razorPayOrderId: string;
 }
 
 interface Payment {
@@ -36,7 +38,8 @@ class OrderController {
   // @desc Create order
   // @access Private
   public async createOrder(req: Request, res: Response, next: NextFunction) {
-    const { products, addressId, payment } = req.body as CreateOrder;
+    const { products, addressId, payment, razorPayOrderId } =
+      req.body as CreateOrder;
     const user = req.user as UserInterface;
 
     // Validate request
@@ -78,6 +81,7 @@ class OrderController {
           discount: payment.discount,
           paymentType: payment.paymentType,
           orderId: order.id,
+          razorPayOrderId: razorPayOrderId ? razorPayOrderId : null,
         },
       });
 
@@ -99,6 +103,58 @@ class OrderController {
       return res.status(201).json({
         message: "Order created successfully",
         ok: true,
+      });
+    } catch (error) {
+      return next(HttpError.internalServerError("Internal server error"));
+    }
+  }
+
+  // @route GET /api/order/confirm/payment
+  // @desc Confirm online payment
+  // @access Private
+
+  public async confirmPayment(req: Request, res: Response, next: NextFunction) {
+    const { orderId, paymentId, signature } = req.body;
+
+    if (!orderId || !paymentId || !signature)
+      return next(HttpError.unporcessableEntity("Order id is required"));
+
+    try {
+      const payment = await PrismaClientProvider.get().payment.findFirst({
+        where: {
+          razorPayOrderId: orderId,
+        },
+      });
+
+      if (payment == null) {
+        return next(HttpError.notFound("Payment not found!"));
+      }
+
+      const generatedSecret = crypto
+        .createHash("sha256")
+        .update(
+          `${RAZORPAY_KEY_SECRET}|${payment.razorPayOrderId}|${payment.razorPayPaymentId}`
+        )
+        .digest("hex");
+
+      if (generatedSecret !== signature) {
+        return next(HttpError.unauthorized("Invalid signature"));
+      }
+
+      await PrismaClientProvider.get().payment.update({
+        where: {
+          id: payment.id,
+        },
+        data: {
+          razorPayPaymentId: orderId,
+          razorPaySignature: signature,
+          paymentStatus: true,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        message: "Payment confirmed successfully",
       });
     } catch (error) {
       return next(HttpError.internalServerError("Internal server error"));
