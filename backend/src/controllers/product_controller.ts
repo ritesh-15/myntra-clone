@@ -121,7 +121,7 @@ class ProductController {
   // @access Public
 
   public async getAllProducts(req: Request, res: Response, next: NextFunction) {
-    const { query, page, size } = req.query;
+    const { query, page, size, paginate } = req.query;
 
     const { skip, limit, result } = pagination(
       page,
@@ -178,8 +178,8 @@ class ProductController {
             },
           },
         },
-        skip: skip,
-        take: limit,
+        skip: paginate ? skip : undefined,
+        take: paginate ? limit : undefined,
       });
 
       return res.status(200).json({
@@ -206,8 +206,6 @@ class ProductController {
     const { id } = req.params;
     const { refetch } = req.query;
     let user = req.user;
-
-    console.log(user);
 
     if (!id) return next(HttpError.unporcessableEntity("Id not found!"));
 
