@@ -8,7 +8,6 @@ import RedisProvider from "../providers/redis_client";
 import { createOrderSchema } from "../validation/order";
 import Razorpay from "razorpay";
 import { RAZORPAY_API_KEY, RAZORPAY_KEY_SECRET } from "../keys/secrets";
-import crypto from "crypto";
 
 interface CreateOrder {
   products: Product[];
@@ -116,7 +115,7 @@ class OrderController {
   public async confirmPayment(req: Request, res: Response, next: NextFunction) {
     const { payload } = req.body;
 
-    console.log(payload);
+    console.log(req.body);
 
     return res.json({
       payload: payload,
