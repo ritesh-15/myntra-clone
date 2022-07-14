@@ -15,7 +15,7 @@ interface UserApiInterface {
         @Path("id") id:String
     ):RemoveAddressResponse
 
-    @GET("user/add-address")
+    @POST("user/add-address")
     suspend fun addAddress(
         @Body body:AddAddressRequestBody
     ):AddAddressResponse

@@ -17,4 +17,6 @@ interface CartRepository {
     fun addToCart(cart:CartEntity):Flow<Resource<Any>>
 
     fun findCartProduct(productId:String):Flow<Resource<Cart>>
+
+    fun emptyCart():Flow<Resource<Any>>
 }

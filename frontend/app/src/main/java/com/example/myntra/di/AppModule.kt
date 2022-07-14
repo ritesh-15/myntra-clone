@@ -37,6 +37,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+import com.razorpay.Checkout
 
 
 @Module
@@ -122,6 +123,14 @@ object AppModule {
     @Singleton
     fun provideCartRepository(db: MyDatabase): CartRepository {
         return CartRepositoryImpl(db.cartDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRazorpay(app: Application): Checkout {
+        val checkout = Checkout()
+        checkout.setKeyID("rzp_test_6gToaqyPuWXxYW")
+        return checkout
     }
 
     @Provides

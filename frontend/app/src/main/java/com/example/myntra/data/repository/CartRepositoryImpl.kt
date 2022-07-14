@@ -19,6 +19,13 @@ class CartRepositoryImpl(
         }
     }
 
+    override fun emptyCart(): Flow<Resource<Any>> {
+        return flow {
+            dao.emptyCart()
+            emit(Resource.Success())
+        }
+    }
+
     override fun updateQuantity(cartId: String, quantity: Int): Flow<Resource<Any>> {
         return flow {
             dao.updateQuantity(cartId, quantity)

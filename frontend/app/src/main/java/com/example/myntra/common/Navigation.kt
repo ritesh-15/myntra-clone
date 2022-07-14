@@ -9,14 +9,20 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.myntra.domain.model.User
 import com.example.myntra.presentation.ResetPasswordScreen
+import com.example.myntra.presentation.address_screen.AddressesScreen
 import com.example.myntra.presentation.bag_screen.BagScreen
 import com.example.myntra.presentation.categories_screen.CategoriesScreen
+import com.example.myntra.presentation.checkout_screen.CheckoutScreen
+import com.example.myntra.presentation.choose_address_screen.ChooseAddressBottomBar
+import com.example.myntra.presentation.choose_address_screen.ChooseAddressScreen
 import com.example.myntra.presentation.complete_sign_up.CompleteSignUpScreen
 import com.example.myntra.presentation.explorer_screen.ExplorerScreen
 import com.example.myntra.presentation.home_screen.HomeScreen
 import com.example.myntra.presentation.link_create_account_screen.LinkCreateAccountScreen
 import com.example.myntra.presentation.login_screen.LoginScreen
 import com.example.myntra.presentation.login_signup_screen.LoginSignUpScreen
+import com.example.myntra.presentation.order_history.OrderHistoryScreen
+import com.example.myntra.presentation.order_placed.OrderPlacedScreen
 import com.example.myntra.presentation.profile_screen.ProfileScreen
 import com.example.myntra.presentation.refresh_screen.RefreshScreen
 import com.example.myntra.presentation.single_category_screen.SingleCategoryScreen
@@ -122,6 +128,34 @@ fun Navigation(navController: NavHostController) {
         composable(route = Screen.Explore.route) {
             ExplorerScreen(navController)
         }
+
+        composable(route = Screen.ChooseAddressScreen.route) {
+            ChooseAddressScreen(navController)
+        }
+
+        composable(route = Screen.OrderPlaced.route) {
+            OrderPlacedScreen(navController)
+        }
+
+        composable(route = Screen.OrderHistoryScreen.route) {
+            OrderHistoryScreen(navController)
+        }
+
+        composable(route = Screen.AddressesScreen.route) {
+            AddressesScreen(navController)
+        }
+
+        composable(route = Screen.CheckoutScreen.route,
+            arguments = listOf(
+                navArgument("addressId") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            CheckoutScreen(navController = navController,
+                addressId = it.arguments?.getString("addressId") ?: "")
+        }
+
     }
 
 }

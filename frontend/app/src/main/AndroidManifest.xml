@@ -5,6 +5,10 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <meta-data
+        android:name="com.razorpay.ApiKey"
+        android:value="rzp_test_6gToaqyPuWXxYW" />
+
     <application
         android:name=".MyntraApplication"
         android:allowBackup="true"

@@ -94,6 +94,9 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
 
+    // razorpay
+    implementation 'com.razorpay:checkout:1.6.19'
+
     // dagger hilt
     implementation "com.google.dagger:hilt-android:2.38.1"
     kapt "com.google.dagger:hilt-android-compiler:2.37"

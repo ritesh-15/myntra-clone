@@ -41,6 +41,7 @@ class UserRepositoryImpl(
         }
     }
 
+
     override fun removeAddress(id: String): Flow<Resource<RemoveAddressResponse>> {
         return flow {
             emit(Resource.Loading())
@@ -99,6 +100,7 @@ class UserRepositoryImpl(
     override fun logoutUser(): Flow<Resource<Any>> {
         return flow {
             emit(Resource.Loading())
+            dao.removeAddressesWhenLogOut()
             dao.logoutUser()
             emit(Resource.Success())
         }
@@ -122,4 +124,5 @@ class UserRepositoryImpl(
             emit(Resource.Success(data = updatedUser?.toUser()))
         }
     }
+
 }

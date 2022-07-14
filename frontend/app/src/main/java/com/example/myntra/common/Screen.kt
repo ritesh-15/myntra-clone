@@ -53,4 +53,18 @@ sealed class Screen(
     object ProfileScreen:Screen("profile_screen")
 
     object UpdateProfileScreen:Screen("update_profile_screen")
+
+    object ChooseAddressScreen:Screen("choose_address_screen")
+
+    object OrderPlaced:Screen("order_placed_screen")
+
+    object OrderHistoryScreen:Screen("order_history_screen")
+
+    object AddressesScreen:Screen("address_screen")
+
+    object CheckoutScreen:Screen("checkout_screen/{addressId}"){
+        fun passAddressId(addressId:String):String{
+            return "checkout_screen/$addressId"
+        }
+    }
 }

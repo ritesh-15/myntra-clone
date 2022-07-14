@@ -25,4 +25,6 @@ interface UserDao {
     @Query("SELECT * FROM addresses")
     suspend fun getAllAddresses(): List<AddressEntity>
 
+    @Query("DELETE  FROM addresses")
+    suspend fun removeAddressesWhenLogOut()
 }

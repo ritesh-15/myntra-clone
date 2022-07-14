@@ -23,4 +23,5 @@ interface UserRepository {
     fun logoutUser():Flow<Resource<Any>>
 
     fun updateUser(id:String,body:UpdateUserRequestBody):Flow<Resource<User>>
+
 }

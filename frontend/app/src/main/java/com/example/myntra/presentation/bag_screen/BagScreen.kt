@@ -38,12 +38,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.myntra.R
+import com.example.myntra.common.Screen
 import com.example.myntra.domain.model.Cart
 import com.example.myntra.domain.model.Product
-import com.example.myntra.ui.theme.Poppins
-import com.example.myntra.ui.theme.green
-import com.example.myntra.ui.theme.light
-import com.example.myntra.ui.theme.primary
+import com.example.myntra.ui.theme.*
 
 @Composable
 fun BagScreen(
@@ -100,7 +98,7 @@ fun BagScreen(
         scaffoldState = scaffoldState,
         bottomBar = {
             if (state.products?.size != 0) {
-                BagScreenBottomBar()
+                BagScreenBottomBar(navController)
             }
         }
     ) {
@@ -157,35 +155,31 @@ fun EmptyCart() {
 }
 
 @Composable
-fun BagScreenBottomBar() {
+fun BagScreenBottomBar(navController: NavController) {
     BottomNavigation(
-        backgroundColor = Color.White,
+        modifier = Modifier
+            .background(Color.White)
+            .padding(12.dp)
     ) {
-        Row(
+
+        Button(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-                .background(Color.White),
-            verticalAlignment = Alignment.CenterVertically
+                .background(primary)
+                .fillMaxSize(),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = primary,
+                contentColor = Color.White
+            ),
+            onClick = {
+                navController.navigate(Screen.ChooseAddressScreen.route)
+            },
+            elevation = ButtonDefaults.elevation(0.dp),
         ) {
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = primary,
-                    contentColor = Color.White
-                ),
-                onClick = {
-
-                },
-                elevation = ButtonDefaults.elevation(0.dp),
-                contentPadding = PaddingValues(12.dp)
-            ) {
-                Text(text = "place order".uppercase(), fontFamily = Poppins)
-            }
+            Text(text = "place order".uppercase(), fontFamily = Poppins)
         }
-
     }
+
+
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
