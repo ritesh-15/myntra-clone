@@ -21,14 +21,8 @@ import com.example.myntra.data.remote.api.authentication.AuthenticationInterface
 import com.example.myntra.data.remote.api.order.OrderApiInterface
 import com.example.myntra.data.remote.api.products.ProductInterface
 import com.example.myntra.data.remote.api.user.UserApiInterface
-import com.example.myntra.data.repository.AuthRepositoryImpl
-import com.example.myntra.data.repository.CartRepositoryImpl
-import com.example.myntra.data.repository.ProductRepositoryImpl
-import com.example.myntra.data.repository.UserRepositoryImpl
-import com.example.myntra.domain.repository.AuthRepository
-import com.example.myntra.domain.repository.CartRepository
-import com.example.myntra.domain.repository.ProductRepository
-import com.example.myntra.domain.repository.UserRepository
+import com.example.myntra.data.repository.*
+import com.example.myntra.domain.repository.*
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -57,7 +51,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit( pref: SharedPreferences): Retrofit {
+    fun provideRetrofit(pref: SharedPreferences): Retrofit {
         val json = GsonBuilder()
             .setLenient()
             .create()
@@ -134,6 +128,12 @@ object AppModule {
     @Singleton
     fun provideUserRepository(api: UserApiInterface, db: MyDatabase): UserRepository {
         return UserRepositoryImpl(api = api, dao = db.userDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrderRepository(api: OrderApiInterface): OrderRepository {
+        return OrderRepositoryImpl(api = api)
     }
 
     @Provides

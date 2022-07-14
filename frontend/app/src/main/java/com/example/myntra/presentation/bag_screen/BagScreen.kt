@@ -1,8 +1,9 @@
 package com.example.myntra.presentation.bag_screen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import android.annotation.SuppressLint
+import android.hardware.lights.Light
+import android.widget.Space
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -13,9 +14,13 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -36,6 +41,7 @@ import com.example.myntra.R
 import com.example.myntra.domain.model.Cart
 import com.example.myntra.domain.model.Product
 import com.example.myntra.ui.theme.Poppins
+import com.example.myntra.ui.theme.green
 import com.example.myntra.ui.theme.light
 import com.example.myntra.ui.theme.primary
 
@@ -67,7 +73,9 @@ fun BagScreen(
         totalAmount.value = 0
 
         products?.map { it ->
-            discount.value += (it.product.originalPrice - it.product.discountPrice) * it.quantity
+            discount.value += (
+                    if (it.product.discount == 0) 0 else it.product.originalPrice - it.product.discountPrice
+                    ) * it.quantity
             total.value += it.product.originalPrice * it.quantity
             totalAmount.value += if (it.product.discount == 0)
                 it.product.originalPrice * it.quantity
@@ -107,11 +115,11 @@ fun BagScreen(
                     CartProduct(cart,
                         viewModel,
                         removeFromCart = { it -> removeFromCart(it) },
-                        calculatePrice = {})
+                        calculatePrice = { calculatePrice() })
                 }
 
                 item {
-                    PriceDetails(total.value, totalAmount.value, discount.value)
+                    PriceDetails(total.value, totalAmount.value, discount.value, viewModel)
                 }
             }
         } else {
@@ -171,7 +179,7 @@ fun BagScreenBottomBar() {
 
                 },
                 elevation = ButtonDefaults.elevation(0.dp),
-                contentPadding = PaddingValues(8.dp)
+                contentPadding = PaddingValues(12.dp)
             ) {
                 Text(text = "place order".uppercase(), fontFamily = Poppins)
             }
@@ -180,14 +188,15 @@ fun BagScreenBottomBar() {
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun PriceDetails(total: Int, totalAmount: Int, discount: Int) {
+fun PriceDetails(total: Int, totalAmount: Int, discount: Int, viewModel: CartViewModel) {
     Column(
         modifier = Modifier
             .background(Color.White)
             .padding(12.dp)
     ) {
-        Text(text = "Price Details (1 Items)",
+        Text(text = "Price Details (${viewModel.state.value.products?.size} Items)",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = Poppins, maxLines = 1,
@@ -196,8 +205,9 @@ fun PriceDetails(total: Int, totalAmount: Int, discount: Int) {
         Spacer(modifier = Modifier.height(8.dp))
 
         PriceRow("Total MRP", "₹ $total")
-        PriceRow("Discount on MRP", "₹ $discount")
         Spacer(modifier = Modifier.height(4.dp))
+        PriceRow("Discount on MRP", "₹ $discount", discount = true)
+        Spacer(modifier = Modifier.height(8.dp))
         Divider()
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -222,7 +232,7 @@ fun PriceDetails(total: Int, totalAmount: Int, discount: Int) {
 }
 
 @Composable
-fun PriceRow(title: String, value: String) {
+fun PriceRow(title: String, value: String, discount: Boolean = false) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -237,7 +247,9 @@ fun PriceRow(title: String, value: String) {
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
             fontFamily = Poppins, maxLines = 1,
-            overflow = TextOverflow.Ellipsis)
+            overflow = TextOverflow.Ellipsis,
+            color = if (discount) Color.Green else Color.Black
+        )
     }
 }
 
@@ -248,6 +260,15 @@ fun CartProduct(
     calculatePrice: () -> Unit,
     removeFromCart: (product: Product) -> Unit,
 ) {
+
+    val quantity = remember {
+        mutableStateOf(cart.quantity)
+    }
+
+    LaunchedEffect(quantity.value) {
+        viewModel.getAllCartProducts()
+    }
+
     Card(
         elevation = 0.dp,
         shape = RectangleShape,
@@ -288,7 +309,11 @@ fun CartProduct(
                         removeFromCart(cart.product)
                         viewModel.getAllCartProducts()
                     }) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = null)
+                        Icon(imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .width(20.dp)
+                                .height(20.dp))
                     }
                 }
 
@@ -342,6 +367,111 @@ fun CartProduct(
                         )
                     }
 
+                }
+
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // quantity
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    // size
+                    Box(modifier = Modifier
+                        .width(25.dp)
+                        .height(25.dp)
+                        .border(width = 1.dp,
+                            color = Color.Black.copy(alpha = 0.7f),
+                            shape = CircleShape)
+                        .padding(4.dp),
+                        contentAlignment = Alignment.Center)
+                    {
+                        Text(
+                            text = cart.size.title,
+                            fontSize = 12.sp,
+                            fontFamily = Poppins,
+                            overflow = TextOverflow.Ellipsis,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                        )
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .border(
+                                    width = 1.dp,
+                                    color = if (quantity.value > 1) primary else light,
+                                    shape = CircleShape
+                                )
+                                .background(
+                                    if (quantity.value > 1) Color.White else light
+                                )
+                                .clickable(
+                                    role = Role.Button,
+                                    enabled = quantity.value > 1
+                                ) {
+                                    if (quantity.value > 1) {
+                                        quantity.value--;
+                                        viewModel.updateQuantity(cart.id, quantity.value)
+                                    }
+                                }
+                                .padding(4.dp)
+
+                        ) {
+                            Icon(imageVector = Icons.Outlined.Delete,
+                                contentDescription = null,
+                                tint = if (quantity.value > 1) primary else Color.LightGray,
+                                modifier = Modifier
+                                    .width(20.dp)
+                                    .height(20.dp)
+                            )
+
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(text = "${quantity.value}", fontFamily = Poppins, fontSize = 14.sp)
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .border(
+                                    width = 1.dp,
+                                    color = if (quantity.value < 5) primary else light,
+                                    shape = CircleShape
+                                )
+                                .background(
+                                    if (quantity.value < 5) Color.White else light
+                                )
+                                .clickable(
+                                    role = Role.Button,
+                                    enabled = quantity.value < 5
+                                ) {
+                                    if (quantity.value < 5) {
+                                        quantity.value++;
+                                        viewModel.updateQuantity(cart.id, quantity.value)
+                                    }
+                                }
+                                .padding(4.dp)
+                        ) {
+                            Icon(imageVector = Icons.Outlined.Add, contentDescription = null,
+                                tint = if (quantity.value < 5) primary else Color.LightGray,
+                                modifier = Modifier
+                                    .width(20.dp)
+                                    .height(20.dp)
+                            )
+                        }
+
+                    }
                 }
 
             }
