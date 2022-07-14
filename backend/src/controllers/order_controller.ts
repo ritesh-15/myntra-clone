@@ -113,13 +113,39 @@ class OrderController {
   // @access Private
 
   public async confirmPayment(req: Request, res: Response, next: NextFunction) {
-    const { payload } = req.body;
+    const { payload, event } = req.body;
+    const paymentDetails = payload.payment.entity;
 
-    console.log(req.body);
+    try {
+      const foundPayment = await PrismaClientProvider.get().payment.findFirst({
+        where: {
+          razorPayOrderId: paymentDetails.order_id,
+        },
+      });
 
-    return res.json({
-      payload: payload,
-    });
+      if (foundPayment === null) {
+        return next(HttpError.notFound("Payment details not found!"));
+      }
+
+      const isFailed = event === "payment.failed";
+
+      await PrismaClientProvider.get().payment.update({
+        where: {
+          id: foundPayment.id,
+        },
+        data: {
+          razorPayPaymentId: paymentDetails.id,
+          paymentStatus: isFailed ? false : true,
+        },
+      });
+
+      return res.json({
+        ok: true,
+        message: "Payment verified!",
+      });
+    } catch (error) {
+      return next(HttpError.internalServerError("Internal server error!"));
+    }
   }
 
   // @route POST /api/order/payment
