@@ -45,7 +45,7 @@ class OrderController {
     try {
       await createOrderSchema.validateAsync(req.body);
     } catch (error: any) {
-      return next(HttpError.unporcessableEntity(error));
+      return next(HttpError.unporcessableEntity("Unprocessable Entity!"));
     }
 
     try {
