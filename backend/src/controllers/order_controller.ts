@@ -109,56 +109,18 @@ class OrderController {
     }
   }
 
-  // @route GET /api/order/confirm/payment
+  // @route POST /api/order/confirm/payment
   // @desc Confirm online payment
   // @access Private
 
   public async confirmPayment(req: Request, res: Response, next: NextFunction) {
-    const { orderId, paymentId, signature } = req.body;
+    const { payload } = req.body;
 
-    if (!orderId || !paymentId || !signature)
-      return next(HttpError.unporcessableEntity("Order id is required"));
+    console.log(payload);
 
-    try {
-      const payment = await PrismaClientProvider.get().payment.findFirst({
-        where: {
-          razorPayOrderId: orderId,
-        },
-      });
-
-      if (payment == null) {
-        return next(HttpError.notFound("Payment not found!"));
-      }
-
-      const generatedSecret = crypto
-        .createHash("sha256")
-        .update(
-          `${RAZORPAY_KEY_SECRET}|${payment.razorPayOrderId}|${payment.razorPayPaymentId}`
-        )
-        .digest("hex");
-
-      if (generatedSecret !== signature) {
-        return next(HttpError.unauthorized("Invalid signature"));
-      }
-
-      await PrismaClientProvider.get().payment.update({
-        where: {
-          id: payment.id,
-        },
-        data: {
-          razorPayPaymentId: orderId,
-          razorPaySignature: signature,
-          paymentStatus: true,
-        },
-      });
-
-      return res.json({
-        ok: true,
-        message: "Payment confirmed successfully",
-      });
-    } catch (error) {
-      return next(HttpError.internalServerError("Internal server error"));
-    }
+    return res.json({
+      payload: payload,
+    });
   }
 
   // @route POST /api/order/payment

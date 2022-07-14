@@ -11,9 +11,7 @@ router
   .route("/order/all/user")
   .get(authenticate, orderController.getAllOrdersByUser);
 
-router
-  .route("/order/confirm/payment")
-  .post(authenticate, orderController.confirmPayment);
+router.route("/order/confirm/payment").post(orderController.confirmPayment);
 
 router
   .route("/order/all")
