@@ -73,7 +73,8 @@ fun CheckoutScreen(
             Column(
                 modifier = Modifier
                     .size(100.dp)
-                    .background(Color.White, shape = Shapes.medium),
+                    .background(Color.White, shape = Shapes.medium)
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -294,7 +295,7 @@ fun PriceDetails(total: Int, totalAmount: Int, discount: Int) {
             .background(Color.White)
             .padding(12.dp)
     ) {
-        Text(text = "Price Details (2} Items)",
+        Text(text = "Price Detail",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = Poppins, maxLines = 1,

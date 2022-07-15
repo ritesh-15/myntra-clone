@@ -32,7 +32,7 @@ class CategoriesViewModel @Inject constructor(
             response.collect {
                 when (it) {
                     is Resource.Loading -> {
-                        if (it.data != null){
+                        if (it.data != null && it.data.isNotEmpty()){
                             _state.value = CategoriesViewModelState(loading = false, categories = it.data)
                         }else{
                             _state.value = CategoriesViewModelState(loading = true)

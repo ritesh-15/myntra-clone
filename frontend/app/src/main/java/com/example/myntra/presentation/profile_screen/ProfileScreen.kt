@@ -99,8 +99,9 @@ fun ProfileScreen(
                     navController.navigate(Screen.OrderHistoryScreen.route)
                 }
 
-                ProfileItem(icon = Icons.Default.LocationOn, "Addresses", "Check your addresses") {
-
+                ProfileItem(icon = Icons.Default.LocationOn,
+                    "Addresses", "Check your addresses") {
+                    navController.navigate(Screen.AddressesScreen.route )
                 }
 
                 ProfileItem(icon = Icons.Default.AccountCircle,

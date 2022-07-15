@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -19,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
@@ -78,10 +80,27 @@ fun ChooseAddressScreen(
             ChooseAddressBottomBar(navController = navController,
                 viewModel,
                 selectedAddressId.value,
-                state.addresses?.size == 0)
+                state.addresses.isEmpty())
         }
     ) {
-        if (state.addresses?.size == 0) {
+        if (state.loading) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(light),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = primary,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier
+                        .background(Color.White)
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                )
+            }
+        } else if (state.addresses.isEmpty() || viewModel.addNewAddress.value) {
             NoAddressFound(viewModel, modifier = Modifier.padding(it))
         } else {
             LazyColumn(
@@ -89,11 +108,35 @@ fun ChooseAddressScreen(
                     .background(Color.White)
                     .padding(16.dp)
             ) {
-                items(state.addresses) {
-                    SingleAddressItem(it, selectedAddressId.value) { id ->
+                items(state.addresses) { address ->
+                    SingleAddressItem(address, selectedAddressId.value) { id ->
                         changeSelectedId(id)
                     }
                 }
+
+                item {
+                    Button(onClick = {
+                        viewModel.onAddNewAddress(true)
+                    },
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = primary,
+                            backgroundColor = Color.White
+                        ),
+                        contentPadding = PaddingValues(12.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = primary
+                        ),
+                        shape = Shapes.medium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(text = "Add new address".uppercase(),
+                            fontFamily = Poppins,
+                            fontSize = 16.sp)
+                    }
+                }
+
             }
         }
 
@@ -131,7 +174,7 @@ fun NoAddressFound(viewModel: ChooseAddressViewModel, modifier: Modifier = Modif
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Text
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = primary,
@@ -156,7 +199,7 @@ fun NoAddressFound(viewModel: ChooseAddressViewModel, modifier: Modifier = Modif
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Text
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = primary,
@@ -181,7 +224,7 @@ fun NoAddressFound(viewModel: ChooseAddressViewModel, modifier: Modifier = Modif
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Text
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = primary,
@@ -205,7 +248,7 @@ fun NoAddressFound(viewModel: ChooseAddressViewModel, modifier: Modifier = Modif
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Text
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = primary,
@@ -229,7 +272,7 @@ fun NoAddressFound(viewModel: ChooseAddressViewModel, modifier: Modifier = Modif
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Text
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = primary,
@@ -254,7 +297,7 @@ fun NoAddressFound(viewModel: ChooseAddressViewModel, modifier: Modifier = Modif
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Number,
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = primary,
@@ -278,7 +321,7 @@ fun NoAddressFound(viewModel: ChooseAddressViewModel, modifier: Modifier = Modif
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Text
             ),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 cursorColor = primary,
@@ -319,13 +362,13 @@ fun SingleAddressItem(address: Address, selectedAddressId: String, onSelect: (id
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            AddressItem("Country", "India")
-            AddressItem("State", "Maharastra")
-            AddressItem("City", "Pune")
-            AddressItem("Address", "Baburadi baramati")
-            AddressItem("Pin Code", "412204")
-            AddressItem("Phone Number", "9373953501")
-            AddressItem("Nearest Landmark", "Baburadi")
+            AddressItem("Country", address.country)
+            AddressItem("State", address.state)
+            AddressItem("City", address.country)
+            AddressItem("Address", address.address)
+            AddressItem("Pin Code", address.pincode.toString())
+            AddressItem("Phone Number", address.phoneNumber ?: "NA")
+            AddressItem("Nearest Landmark", address.nearestLandmark ?: "NA")
         }
     }
 
@@ -375,7 +418,7 @@ fun ChooseAddressBottomBar(
                 contentColor = Color.White
             ),
             onClick = {
-                if (save) {
+                if (save || viewModel.addNewAddress.value) {
                     viewModel.addAddress()
                 } else {
                     if (selectedAddressId.isEmpty()) {
@@ -403,7 +446,7 @@ fun ChooseAddressBottomBar(
 
             }
 
-            if (save) {
+            if (save || viewModel.addNewAddress.value) {
                 Text(text = "Save".uppercase(), fontFamily = Poppins)
             } else {
                 Text(text = "continue".uppercase(), fontFamily = Poppins)

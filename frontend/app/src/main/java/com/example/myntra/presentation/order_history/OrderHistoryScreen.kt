@@ -1,6 +1,8 @@
 package com.example.myntra.presentation.order_history
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +26,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.myntra.R
+import com.example.myntra.common.Screen
 import com.example.myntra.common.bottom_navigation.AppBottomNavigation
 import com.example.myntra.data.remote.api.order.response.Order
 import com.example.myntra.ui.theme.Poppins
@@ -44,7 +50,8 @@ fun OrderHistoryScreen(
                     Text(text = "Order History", fontFamily = Poppins)
                 }, navigationIcon = ({
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                        Icon(imageVector = Icons.Default.ArrowBack,
+                            contentDescription = null)
                     }
                 }))
         },
@@ -70,9 +77,13 @@ fun OrderHistoryScreen(
                 )
             }
         } else {
-            LazyColumn(modifier = Modifier.padding(it)) {
-                items(state.orders) { order ->
-                    OrderCard(order)
+            if (state.orders.isEmpty()) {
+                EmptyOrders()
+            } else {
+                LazyColumn(modifier = Modifier.padding(it)) {
+                    items(state.orders) { order ->
+                        OrderCard(order, navController)
+                    }
                 }
             }
         }
@@ -83,14 +94,46 @@ fun OrderHistoryScreen(
 }
 
 @Composable
-fun OrderCard(order: Order) {
+fun EmptyOrders() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(painter = painterResource(id = R.drawable.ic_empty_cart),
+            contentDescription = null,
+            modifier = Modifier.height(150.dp),
+            contentScale = ContentScale.Crop)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(text = "You have not have any orders!",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = Poppins)
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(text = "Start shopping now!",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Light,
+            fontFamily = Poppins)
+    }
+}
+
+@Composable
+fun OrderCard(order: Order, navController: NavController) {
     Column(
         modifier = Modifier
             .background(Color.White)
             .padding(12.dp)
+            .clickable {
+                navController.navigate(Screen.SingleOrderScreen.passId(order.id))
+            }
     ) {
 
-        Text(text = order.id, fontFamily = Poppins, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        Text(text = order.id, fontFamily = Poppins, fontSize = 14.sp,
+            fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(4.dp))
 
         Row(
@@ -106,6 +149,9 @@ fun OrderCard(order: Order) {
         Text(text = order.address.address, fontFamily = Poppins, fontSize = 14.sp)
 
     }
+    Divider()
+
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 @Preview(showBackground = true)

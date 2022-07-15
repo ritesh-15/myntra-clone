@@ -46,8 +46,8 @@ class UserRepositoryImpl(
         return flow {
             emit(Resource.Loading())
             try {
-                val response = api.removeAddress(id)
-                emit(Resource.Success(data = response))
+                api.removeAddress(id)
+                dao.removeAddress(id)
             } catch (e: HttpException) {
                 val message: String =
                     "Something went wrong!"
@@ -56,6 +56,7 @@ class UserRepositoryImpl(
                 emit(Resource.Error(message = "Couldn't reach to the server please try again!"))
             }
 
+            emit(Resource.Success())
         }
     }
 

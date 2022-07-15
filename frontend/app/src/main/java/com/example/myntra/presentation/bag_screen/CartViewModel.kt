@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myntra.common.utils.Resource
 import com.example.myntra.domain.model.ApiError
+import com.example.myntra.domain.model.User
 import com.example.myntra.domain.usecases.cart.GetAllCartProducts
 import com.example.myntra.domain.usecases.cart.RemoveFromCartUseCase
 import com.example.myntra.domain.usecases.cart.RemoveFromCartUseCase_Factory
 import com.example.myntra.domain.usecases.cart.UpdateCartQuantityUseCase
 import com.example.myntra.domain.usecases.products.GetAllCategoriesUseCase
+import com.example.myntra.domain.usecases.user.GetUserUseCase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,14 +25,26 @@ import javax.inject.Inject
 class CartViewModel @Inject constructor(
     private val getAllCartProducts: GetAllCartProducts,
     private val removeFromCartUseCase: RemoveFromCartUseCase,
-    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase
+    private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
+    private val getUserUseCase: GetUserUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CartViewModelState())
     val state: StateFlow<CartViewModelState> = _state
 
+    val user = mutableStateOf<User?>(null)
+
     init {
+        getUser()
         getAllCartProducts()
+    }
+
+    fun getUser() {
+        viewModelScope.launch {
+            getUserUseCase.invoke().collect {
+                user.value = it.data
+            }
+        }
     }
 
     fun removeFromCart(productId: String) {
@@ -45,10 +59,10 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    fun updateQuantity(id:String, quantity:Int){
+    fun updateQuantity(id: String, quantity: Int) {
         viewModelScope.launch {
-            updateCartQuantityUseCase.invoke(id, quantity ).collect{
-                when(it){
+            updateCartQuantityUseCase.invoke(id, quantity).collect {
+                when (it) {
                     is Resource.Success -> {
                         // TODO
                     }

@@ -25,6 +25,9 @@ interface UserDao {
     @Query("SELECT * FROM addresses")
     suspend fun getAllAddresses(): List<AddressEntity>
 
+    @Query("DELETE FROM addresses WHERE id=:addressId")
+    suspend fun removeAddress(addressId:String)
+
     @Query("DELETE  FROM addresses")
     suspend fun removeAddressesWhenLogOut()
 }

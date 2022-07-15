@@ -26,6 +26,7 @@ class ChooseAddressViewModel @Inject constructor(
     val state: State<ChooseAddressViewModelState> = _state
 
     val addressErrors = mutableStateOf(AddressDetailError())
+    val addNewAddress = mutableStateOf(false)
 
     val address = mutableStateOf("")
     val country = mutableStateOf("")
@@ -34,6 +35,18 @@ class ChooseAddressViewModel @Inject constructor(
     val countryState = mutableStateOf("")
     val phoneNumber = mutableStateOf("")
     val nearestLandmark = mutableStateOf("")
+
+    fun onAddNewAddress(value:Boolean) {
+        addNewAddress.value = value
+
+        ChangeEvents.OnChangeAddress("")
+        ChangeEvents.OnChangeCity("")
+        ChangeEvents.OnChangeState("")
+        ChangeEvents.OnChangeCountry("")
+        ChangeEvents.OnChangePinCode("")
+        ChangeEvents.OnChangeNearestLandmark("")
+        ChangeEvents.OnChangePhoneNumber("")
+    }
 
     fun onChange(event: ChangeEvents) {
         when (event) {
@@ -97,6 +110,7 @@ class ChooseAddressViewModel @Inject constructor(
                         is Resource.Success -> {
                             _state.value =
                                 ChooseAddressViewModelState(loading = false, address = it.data)
+                            addNewAddress.value = false
                             getAllAddresses()
                         }
 

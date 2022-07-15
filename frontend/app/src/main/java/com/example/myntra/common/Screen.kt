@@ -62,6 +62,12 @@ sealed class Screen(
 
     object AddressesScreen:Screen("address_screen")
 
+    object SingleOrderScreen:Screen("single_order_screen/{id}"){
+        fun passId(id:String):String {
+            return "single_order_screen/$id"
+        }
+    }
+
     object CheckoutScreen:Screen("checkout_screen/{addressId}"){
         fun passAddressId(addressId:String):String{
             return "checkout_screen/$addressId"

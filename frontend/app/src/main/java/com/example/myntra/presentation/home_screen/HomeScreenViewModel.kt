@@ -32,11 +32,11 @@ class HomeScreenVIewModel @Inject constructor(
             response.collect {
                 when (it) {
                     is Resource.Loading -> {
-                       if (it.data != null){
-                           _state.value = HomeScreenVIewModelState(loading = false, products = it.data)
-                       }else{
-                           _state.value = HomeScreenVIewModelState(loading = true)
-                       }
+                        if (it.data != null && it.data.isNotEmpty()){
+                            _state.value = HomeScreenVIewModelState(loading = false, products = it.data)
+                        }else{
+                            _state.value = HomeScreenVIewModelState(loading = true)
+                        }
                     }
 
                     is Resource.Success -> {

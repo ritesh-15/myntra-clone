@@ -18,6 +18,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,11 +43,13 @@ fun LoginScreen(
     val state = viewModel.state.value
     val context = LocalContext.current
 
-    if (state.error != null) {
-        LaunchedEffect(Unit) {
+
+    LaunchedEffect(state.error) {
+        if (state.error != null) {
             Toast.makeText(context, state.error, Toast.LENGTH_SHORT).show()
         }
     }
+
 
     if (state.data != null) {
         LaunchedEffect(Unit) {
@@ -124,11 +128,7 @@ fun LoginScreen(
                     focusedBorderColor = primary,
                     focusedLabelColor = primary
                 ),
-                trailingIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Outlined.CheckCircle, contentDescription = null)
-                    }
-                }
+                visualTransformation = PasswordVisualTransformation()
             )
 
             Spacer(modifier = Modifier.height(16.dp))

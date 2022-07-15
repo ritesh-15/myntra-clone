@@ -98,7 +98,7 @@ fun BagScreen(
         scaffoldState = scaffoldState,
         bottomBar = {
             if (state.products?.size != 0) {
-                BagScreenBottomBar(navController)
+                BagScreenBottomBar(navController, viewModel)
             }
         }
     ) {
@@ -107,7 +107,7 @@ fun BagScreen(
                 modifier = Modifier
                     .fillMaxHeight()
                     .background(light)
-                    .padding(bottom = 50.dp)
+                    .padding(it)
             ) {
                 items(state.products ?: emptyList()) { cart ->
                     CartProduct(cart,
@@ -155,7 +155,7 @@ fun EmptyCart() {
 }
 
 @Composable
-fun BagScreenBottomBar(navController: NavController) {
+fun BagScreenBottomBar(navController: NavController, viewModel: CartViewModel) {
     BottomNavigation(
         modifier = Modifier
             .background(Color.White)
@@ -171,11 +171,19 @@ fun BagScreenBottomBar(navController: NavController) {
                 contentColor = Color.White
             ),
             onClick = {
-                navController.navigate(Screen.ChooseAddressScreen.route)
+                if (viewModel.user.value == null) {
+                    navController.navigate(Screen.LoginSignUp.route)
+                } else {
+                    navController.navigate(Screen.ChooseAddressScreen.route)
+                }
             },
             elevation = ButtonDefaults.elevation(0.dp),
         ) {
-            Text(text = "place order".uppercase(), fontFamily = Poppins)
+            if (viewModel.user.value == null) {
+                Text(text = "Log In/ Sign Up".uppercase(), fontFamily = Poppins)
+            } else {
+                Text(text = "place order".uppercase(), fontFamily = Poppins)
+            }
         }
     }
 

@@ -26,6 +26,7 @@ import com.example.myntra.presentation.order_placed.OrderPlacedScreen
 import com.example.myntra.presentation.profile_screen.ProfileScreen
 import com.example.myntra.presentation.refresh_screen.RefreshScreen
 import com.example.myntra.presentation.single_category_screen.SingleCategoryScreen
+import com.example.myntra.presentation.single_order_screen.SingleOrderScreen
 import com.example.myntra.presentation.single_product_screen.SingleProductScreen
 import com.example.myntra.presentation.update_profile_screen.UpdateProfileScreen
 import com.example.myntra.presentation.verify_otp_screen.VerifyOtpScreen
@@ -154,6 +155,17 @@ fun Navigation(navController: NavHostController) {
         ) {
             CheckoutScreen(navController = navController,
                 addressId = it.arguments?.getString("addressId") ?: "")
+        }
+
+        composable(route = Screen.SingleOrderScreen.route,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            SingleOrderScreen(navController = navController,
+                id = it.arguments?.getString("id") ?: "")
         }
 
     }
