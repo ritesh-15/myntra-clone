@@ -117,8 +117,6 @@ class OrderController {
     const { payload, event } = req.body;
     const paymentDetails = payload.payment.entity;
 
-    console.log(paymentDetails);
-
     try {
       const foundPayment = await PrismaClientProvider.get().payment.findFirst({
         where: {
@@ -130,7 +128,7 @@ class OrderController {
         return next(HttpError.notFound("Payment details not found!"));
       }
 
-      const isFailed = event === "payment.failed";
+      const isSuccess = event === "payment.captured";
 
       await PrismaClientProvider.get().payment.update({
         where: {
@@ -138,7 +136,7 @@ class OrderController {
         },
         data: {
           razorPayPaymentId: paymentDetails.id,
-          paymentStatus: isFailed ? false : true,
+          paymentStatus: isSuccess,
         },
       });
 
