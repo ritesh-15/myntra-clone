@@ -249,6 +249,7 @@ class OrderController {
         result,
       });
     } catch (error) {
+      console.log(error);
       return next(HttpError.internalServerError("Internal server error"));
     }
   }
