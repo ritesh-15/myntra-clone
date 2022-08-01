@@ -352,7 +352,6 @@ class OrderController {
 
   public async updateOrder(req: Request, res: Response, next: NextFunction) {
     const { id } = req.params;
-    const user = req.user as UserInterface;
     const { orderStatus } = req.body;
 
     if (!id) return next(HttpError.notFound("Id not found"));
@@ -362,7 +361,7 @@ class OrderController {
     try {
       const foundOrder = await PrismaClientProvider.get().order.findFirst({
         where: {
-          AND: [{ id }, { userId: user.id }],
+          AND: [{ id }],
         },
       });
 
