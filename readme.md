@@ -65,25 +65,25 @@ Here is my Myntra Clone which is a clone of Myntra App.
 
 #### Android Application
 
-<img src="./1.jpeg" style="object-fit:contain"/>
+<img src="./1.jpeg" width="300" height="700" style="object-fit:contain"/>
 
-<img src="./2.jpeg"  style="object-fit:contain"/>
+<img src="./2.jpeg"  width="300" height="700" style="object-fit:contain"/>
 
-<img src="./3.jpeg"  style="object-fit:contain"/>
+<img src="./3.jpeg"  width="300" height="700" style="object-fit:contain"/>
 
-<img src="./4.jpeg"  style="object-fit:contain"/>
+<img src="./4.jpeg"  width="300" height="700" style="object-fit:contain"/>
 
-<img src="./5.jpeg"  style="object-fit:contain"/>
+<img src="./5.jpeg"  width="300" height="700" style="object-fit:contain"/>
 
-<img src="./6.jpeg"  style="object-fit:contain"/>
+<img src="./6.jpeg"  width="300" height="700" style="object-fit:contain"/>
 
-<img src="./7.jpeg"  style="object-fit:contain"/>
+<img src="./7.jpeg" width="300" height="700" style="object-fit:contain"/>
 
-<img src="./8.jpeg"  style="object-fit:contain"/>
+<img src="./8.jpeg"  width="300" height="700" style="object-fit:contain"/>
 
-<img src="./9.jpeg"  style="object-fit:contain"/>
+<img src="./9.jpeg"  width="300" height="700" style="object-fit:contain"/>
 
-<img src="./10.jpeg" style="object-fit:contain"/>
+<img src="./10.jpeg" width="300" height="700" style="object-fit:contain"/>
 
 #### Admin Dashboard
 
