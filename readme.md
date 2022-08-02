@@ -29,31 +29,31 @@ Here is my Myntra Clone which is a clone of Myntra App.
 
 ## Tech Stack
 
-<img src="./img/jetpack.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/jetpack.png"  style="object-fit:contain"/>
 
-<img src="./img/reddis.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/reddis.png"   style="object-fit:contain"/>
 
-<img src="./img/typescript.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/typescript.png"   style="object-fit:contain"/>
 
-<img src="./img/react.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/react.png"   style="object-fit:contain"/>
 
-<img src="./img/prisma.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/prisma.png"   style="object-fit:contain"/>
 
-<img src="./img/razorpay.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/razorpay.png"  style="object-fit:contain"/>
 
-<img src="./img/redux.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/redux.png"  style="object-fit:contain"/>
 
-<img src="./img/cloudinary.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/cloudinary.png"  style="object-fit:contain"/>
 
-<img src="./img/kotlin.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/kotlin.png"  style="object-fit:contain"/>
 
-<img src="./img/node.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/node.png"  style="object-fit:contain"/>
 
-<img src="./img/sendgrid.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/sendgrid.png"  style="object-fit:contain"/>
 
-<img src="./img/styled.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/styled.png"  style="object-fit:contain"/>
 
-<img src="./img/passport.png" width="200" height="100" style="object-fit:contain"/>
+<img src="./img/passport.png"  style="object-fit:contain"/>
 
 **Web Frontend** - ReactJS, Typescript, Styled Components, Redux, Axios
 
