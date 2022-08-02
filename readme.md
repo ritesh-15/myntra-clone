@@ -16,16 +16,16 @@ Here is my Myntra Clone which is a clone of Myntra App.
 
 ## Additional Features
 
-1. Server side caching by using Redis
-2. Model View Control (MVC) Architecture for backend application
-3. Model View View Model (MVVM) with clean architecture for android frontend application.
-4. Dependancy Injection for the android frontend application
-5. Typescript for the backend as well as web frontend application
-6. Offline data caching in android frontend using Room Database
-7. Instead of using regular XML using Jetpack Compose for application building
-8. Razorpay payment verification using the webhooks of razorpay
-9. Pagination support
-10. Admin pannel for controlling the application
+    1. Server side caching by using Redis
+    2. Model View Control (MVC) Architecture for backend application
+    3. Model View View Model (MVVM) with clean architecture for android    frontend application.
+    4. Dependancy Injection for the android frontend application
+    5. Typescript for the backend as well as web frontend application
+    6. Offline data caching in android frontend using Room Database
+    7. Instead of using regular XML using Jetpack Compose for application building
+    8. Razorpay payment verification using the webhooks of razorpay
+    9. Pagination support
+    10. Admin pannel for controlling the application
 
 ## Tech Stack
 
