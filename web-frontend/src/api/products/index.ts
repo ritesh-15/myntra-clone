@@ -7,8 +7,10 @@ class ProductApi {
 
   static getAllProducts(page: number, limit: number, query?: string) {
     return query
-      ? api.get(`/product/all?query=${query}&page=${page}&limit=${limit}`)
-      : api.get(`/product/all?page=${page}&limit=${limit}`);
+      ? api.get(
+          `/product/all?query=${query}&page=${page}&limit=${limit}&paginate=true`
+        )
+      : api.get(`/product/all?page=${page}&limit=${limit}&paginate=true`);
   }
 
   static getSingleProduct(id: string, refetch: boolean = false) {

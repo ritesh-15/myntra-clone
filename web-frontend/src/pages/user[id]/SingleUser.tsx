@@ -176,7 +176,7 @@ const SingleUser: FC = (): JSX.Element => {
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      <Link to={`/products/${row?.id}`}>{row?.id}</Link>
+                      {row?.id}
                     </TableCell>
                     <TableCell align="right">{row?.address}</TableCell>
                     <TableCell align="right">{row?.country}</TableCell>
@@ -212,7 +212,7 @@ const SingleUser: FC = (): JSX.Element => {
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      <Link to={`/products/${row?.id}`}>{row?.id}</Link>
+                      <Link to={`/orders/${row?.id}`}>{row?.id}</Link>
                     </TableCell>
                     <TableCell align="right">{row?.addressId}</TableCell>
                     <TableCell align="right">
