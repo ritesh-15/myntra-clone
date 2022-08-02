@@ -99,7 +99,7 @@ class AuthController {
     const { email, password } = req.body as LoginBody;
 
     if (!email || !password) {
-      return next(HttpError.badRequest("Missing phone number or password"));
+      return next(HttpError.badRequest("Missing email or password"));
     }
 
     try {
