@@ -24,7 +24,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon -L src/server.ts",
-    "start": "node src/server.js",
+    "start": "node build/server.js",
     "build": "tsc -p ."
   },
   "devDependencies": {
