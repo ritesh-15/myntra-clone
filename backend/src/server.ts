@@ -39,7 +39,7 @@ const main = async () => {
       cors({
         origin: [
           "http://localhost:3000",
-          "https://62c90fc4c26d322821b958b9--beamish-unicorn-685f33.netlify.app",
+          "https://quiet-liger-ff8153.netlify.app",
         ],
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE"],
