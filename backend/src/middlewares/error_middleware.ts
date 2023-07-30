@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import HttpError from "../helper/error_handler";
+import { NextFunction, Request, Response } from "express"
+import HttpError from "../helper/error_handler"
 
 export const errorMiddleware = (
   error: Error,
@@ -12,13 +12,13 @@ export const errorMiddleware = (
       status: error.status,
       message: error.message,
       ok: false,
-    });
+    })
   } else {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
       status: 500,
       message: "Internal Server Error",
       ok: false,
-    });
+    })
   }
-};
+}

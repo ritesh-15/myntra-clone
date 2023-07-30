@@ -1,36 +1,36 @@
-import { NextFunction, Request, Response } from "express";
-import HttpError from "../helper/error_handler";
-import OtpGenerator from "../helper/otp_generator";
-import PrismaClientProvider from "../providers/provide_prism_client";
-import bcrypt from "bcrypt";
-import JwtHelper from "../helper/jwt_helper";
-import UserDto from "../dtos/UserDto";
-import { UserInterface } from "../interfaces/UserInterface";
-import RedisProvider from "../providers/redis_client";
+import { NextFunction, Request, Response } from "express"
+import HttpError from "../helper/error_handler"
+import OtpGenerator from "../helper/otp_generator"
+import PrismaClientProvider from "../providers/provide_prism_client"
+import bcrypt from "bcrypt"
+import JwtHelper from "../helper/jwt_helper"
+import UserDto from "../dtos/UserDto"
+import { UserInterface } from "../interfaces/UserInterface"
+import RedisProvider from "../providers/redis_client"
 
 interface RegisterBody {
-  email: string;
+  email: string
 }
 
 interface LoginBody {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 interface VerifyOtpBody {
-  email: string;
-  otp: number;
-  hash: string;
+  email: string
+  otp: number
+  hash: string
 }
 
 interface ActivateAccountBody {
-  password: string;
-  name: string;
-  phoneNumber: string;
+  password: string
+  name: string
+  phoneNumber: string
 }
 
 interface ForgotPasswordBody {
-  email: string;
+  email: string
 }
 
 class AuthController {
@@ -38,10 +38,10 @@ class AuthController {
   // @desc   Register user
   // @access Public
   public async register(req: Request, res: Response, next: NextFunction) {
-    const { email } = req.body as RegisterBody;
+    const { email } = req.body as RegisterBody
 
     if (!email) {
-      return next(HttpError.notFound("Phone number not found!"));
+      return next(HttpError.notFound("Phone number not found!"))
     }
 
     // find user by phone number
@@ -50,13 +50,13 @@ class AuthController {
         where: {
           email,
         },
-      });
+      })
 
       if (user != null) {
-        return next(HttpError.badRequest("User already exists"));
+        return next(HttpError.badRequest("User already exists"))
       }
 
-      console.log(email);
+      console.log(email)
 
       // create user
       await PrismaClientProvider.get().user.create({
@@ -71,24 +71,24 @@ class AuthController {
           resetToken: "",
           resetTokenExpiry: null,
         },
-      });
+      })
 
       // create the otp
       const newOtp = new OtpGenerator({
         email: email,
-      });
+      })
 
-      await newOtp.send();
+      await newOtp.send()
 
       return res.status(201).json({
         message: "One time password sent successfully!",
         email: email,
         hash: `${newOtp.hash}.${newOtp.expiresIn}`,
         ok: true,
-      });
+      })
     } catch (error: any) {
-      console.log(error);
-      return next(HttpError.internalServerError("Internal Server Error"));
+      console.log(error)
+      return next(HttpError.internalServerError("Internal Server Error"))
     }
   }
 
@@ -96,10 +96,10 @@ class AuthController {
   // @desc   Login user
   // @access Public
   public async login(req: Request, res: Response, next: NextFunction) {
-    const { email, password } = req.body as LoginBody;
+    const { email, password } = req.body as LoginBody
 
     if (!email || !password) {
-      return next(HttpError.badRequest("Missing email or password"));
+      return next(HttpError.badRequest("Missing email or password"))
     }
 
     try {
@@ -108,38 +108,38 @@ class AuthController {
         where: {
           email,
         },
-      });
+      })
 
       if (user == null) {
-        return next(HttpError.badRequest("User does not exist"));
+        return next(HttpError.badRequest("User does not exist"))
       }
 
       if (!user.isActive) {
-        return next(HttpError.badRequest("User is not active"));
+        return next(HttpError.badRequest("User is not active"))
       }
 
       // check if password matches
-      const isAuth = await bcrypt.compare(password, user.password!!);
+      const isAuth = await bcrypt.compare(password, user.password!!)
 
       if (!isAuth) {
-        return next(HttpError.badRequest("Invalide email address or password"));
+        return next(HttpError.badRequest("Invalide email address or password"))
       }
 
       // create jwt tokens
-      const { accessToken, refreshToken } = JwtHelper.generateTokens(user.id);
+      const { accessToken, refreshToken } = JwtHelper.generateTokens(user.id)
 
       // set refresh token in cache
-      await RedisProvider.getInstance().set(user.id, refreshToken);
+      await RedisProvider.getInstance().set(user.id, refreshToken)
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      })
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      })
 
       return res.status(200).json({
         tokens: {
@@ -148,9 +148,9 @@ class AuthController {
         },
         user: new UserDto(user),
         ok: true,
-      });
+      })
     } catch (error) {
-      return next(HttpError.internalServerError("Internal Server Error"));
+      return next(HttpError.internalServerError("Internal Server Error"))
     }
   }
 
@@ -158,10 +158,10 @@ class AuthController {
   // @desc   Verify otp
   // @access Public
   public async verifyOtp(req: Request, res: Response, next: NextFunction) {
-    const { email, otp, hash } = req.body as VerifyOtpBody;
+    const { email, otp, hash } = req.body as VerifyOtpBody
 
     if (!email || !otp || !hash) {
-      return next(HttpError.badRequest("Email or otp or hash not found"));
+      return next(HttpError.badRequest("Email or otp or hash not found"))
     }
 
     try {
@@ -170,18 +170,18 @@ class AuthController {
         where: {
           email,
         },
-      });
+      })
 
       if (user == null) {
-        return next(HttpError.badRequest("User does not exist"));
+        return next(HttpError.badRequest("User does not exist"))
       }
 
       // check if otp matches
 
-      const [otpHash, time] = hash.split(".");
+      const [otpHash, time] = hash.split(".")
 
       if (parseInt(time) < Date.now()) {
-        return next(HttpError.badRequest("Otp is expired"));
+        return next(HttpError.badRequest("Otp is expired"))
       }
 
       const isOtpValid = OtpGenerator.verify(
@@ -191,10 +191,10 @@ class AuthController {
           expiresIn: parseInt(time),
         },
         otpHash
-      );
+      )
 
       if (!isOtpValid) {
-        return next(HttpError.badRequest("Invalid otp"));
+        return next(HttpError.badRequest("Invalid otp"))
       }
 
       user = await PrismaClientProvider.get().user.update({
@@ -204,23 +204,25 @@ class AuthController {
         data: {
           isVerified: true,
         },
-      });
+      })
 
       // create jwt tokens
-      const { accessToken, refreshToken } = JwtHelper.generateTokens(user.id);
+      const { accessToken, refreshToken } = JwtHelper.generateTokens(user.id)
+
+      console.log(RedisProvider.getInstance().isOpen)
 
       // set refresh token in cache
-      await RedisProvider.getInstance().set(user.id, refreshToken);
+      await RedisProvider.getInstance().set(user.id, refreshToken)
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      })
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      })
 
       return res.status(200).json({
         tokens: {
@@ -229,9 +231,10 @@ class AuthController {
         },
         user: new UserDto(user),
         ok: true,
-      });
+      })
     } catch (error) {
-      return next(HttpError.internalServerError("Internal Server Error"));
+      console.log(error)
+      return next(HttpError.internalServerError("Internal Server Error"))
     }
   }
 
@@ -239,19 +242,19 @@ class AuthController {
   // @desc   Activate account
   // @access Private
   public async activate(req: Request, res: Response, next: NextFunction) {
-    const { name, phoneNumber, password } = req.body as ActivateAccountBody;
-    const user = req.user as UserInterface;
+    const { name, phoneNumber, password } = req.body as ActivateAccountBody
+    const user = req.user as UserInterface
 
     if (!name || !phoneNumber || !password) {
       return next(
         HttpError.unporcessableEntity(
           "Missing name or phone number or password"
         )
-      );
+      )
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10)
 
       const updatedUser = await PrismaClientProvider.get().user.update({
         where: {
@@ -263,14 +266,14 @@ class AuthController {
           password: hashedPassword,
           isActive: true,
         },
-      });
+      })
 
       return res.status(201).json({
         user: new UserDto(updatedUser),
         ok: true,
-      });
+      })
     } catch (error) {
-      return next(HttpError.internalServerError("Internal Server Error"));
+      return next(HttpError.internalServerError("Internal Server Error"))
     }
   }
 
@@ -278,10 +281,10 @@ class AuthController {
   // @desc   Resend Otp
   // @access Public
   public async resendOtp(req: Request, res: Response, next: NextFunction) {
-    const { email } = req.body as RegisterBody;
+    const { email } = req.body as RegisterBody
 
     if (!email) {
-      return next(HttpError.notFound("Email address not found!"));
+      return next(HttpError.notFound("Email address not found!"))
     }
 
     // find user by email
@@ -290,27 +293,27 @@ class AuthController {
         where: {
           email,
         },
-      });
+      })
 
       if (user == null) {
-        return next(HttpError.badRequest("User not found!"));
+        return next(HttpError.badRequest("User not found!"))
       }
 
       // create the otp
       const newOtp = new OtpGenerator({
         email: email,
-      });
+      })
 
-      await newOtp.send();
+      await newOtp.send()
 
       return res.status(201).json({
         message: "One time password sent successfully!",
         hash: `${newOtp.hash}.${newOtp.expiresIn}`,
         ok: true,
         email: email,
-      });
+      })
     } catch (error) {
-      return next(HttpError.internalServerError("Internal Server Error"));
+      return next(HttpError.internalServerError("Internal Server Error"))
     }
   }
 
@@ -318,53 +321,52 @@ class AuthController {
   // @desc   Resend Otp
   // @access Public
   public async refresh(req: Request, res: Response, next: NextFunction) {
-    let recivedRefreshToken = req.cookies.refreshToken;
+    let recivedRefreshToken = req.cookies.refreshToken
 
     if (!recivedRefreshToken) {
-      recivedRefreshToken = req.headers["refreshtoken"];
+      recivedRefreshToken = req.headers["refreshtoken"]
       if (recivedRefreshToken) {
-        recivedRefreshToken = recivedRefreshToken.split(" ")[1];
+        recivedRefreshToken = recivedRefreshToken.split(" ")[1]
       }
     }
 
     try {
       // validate the token with jwt
-      const data = JwtHelper.validateRefreshToken(recivedRefreshToken);
+      const data = JwtHelper.validateRefreshToken(recivedRefreshToken)
 
       // find the token in cache
-      const token = await RedisProvider.getInstance().get(data.id);
+      const token = await RedisProvider.getInstance().get(data.id)
 
-      if (token == null)
-        return next(HttpError.unauthorized("Session expired!"));
+      if (token == null) return next(HttpError.unauthorized("Session expired!"))
 
       // generate new tokens
-      const { accessToken, refreshToken } = JwtHelper.generateTokens(data.id);
+      const { accessToken, refreshToken } = JwtHelper.generateTokens(data.id)
 
       // revoke previous refresh token
-      await RedisProvider.getInstance().del(data.id);
+      await RedisProvider.getInstance().del(data.id)
 
       // set token in redis
-      await RedisProvider.getInstance().set(data.id, refreshToken);
+      await RedisProvider.getInstance().set(data.id, refreshToken)
 
       // get user details
       const user = await PrismaClientProvider.get().user.findUnique({
         where: {
           id: data.id,
         },
-      });
+      })
 
-      if (user == null) return next(HttpError.notFound("User not found!"));
+      if (user == null) return next(HttpError.notFound("User not found!"))
 
       // set cookies
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      })
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      })
 
       return res.status(200).json({
         tokens: {
@@ -373,9 +375,9 @@ class AuthController {
         },
         ok: true,
         user: new UserDto(user),
-      });
+      })
     } catch (error) {
-      return next(HttpError.unauthorized("Token not found!"));
+      return next(HttpError.unauthorized("Token not found!"))
     }
   }
 
@@ -383,22 +385,22 @@ class AuthController {
   // @desc   Log out user
   // @access Private
   public async logout(req: Request, res: Response, next: NextFunction) {
-    const user = req.user as UserInterface;
+    const user = req.user as UserInterface
 
     try {
       // revoke previous tokens
-      await RedisProvider.getInstance().del(user.id);
+      await RedisProvider.getInstance().del(user.id)
 
       // clear cookies
-      res.clearCookie("accessToken");
-      res.clearCookie("refreshToken");
+      res.clearCookie("accessToken")
+      res.clearCookie("refreshToken")
 
       return res.status(200).json({
         message: "Logout successfully!",
         ok: true,
-      });
+      })
     } catch (error) {
-      return next(HttpError.internalServerError("Internal Server Error"));
+      return next(HttpError.internalServerError("Internal Server Error"))
     }
   }
 
@@ -407,10 +409,10 @@ class AuthController {
   // @access Public
 
   public async forgotPassword(req: Request, res: Response, next: NextFunction) {
-    const { email } = req.body as ForgotPasswordBody;
+    const { email } = req.body as ForgotPasswordBody
 
     if (!email)
-      return next(HttpError.unporcessableEntity("Email address not found!"));
+      return next(HttpError.unporcessableEntity("Email address not found!"))
 
     try {
       // find the user
@@ -418,17 +420,17 @@ class AuthController {
         where: {
           email,
         },
-      });
+      })
 
-      if (user == null) return next(HttpError.notFound("User not found!"));
+      if (user == null) return next(HttpError.notFound("User not found!"))
 
       // create the link
 
       // TODO
     } catch (error) {
-      return next(HttpError.internalServerError("Internal Server Error"));
+      return next(HttpError.internalServerError("Internal Server Error"))
     }
   }
 }
 
-export default new AuthController();
+export default new AuthController()

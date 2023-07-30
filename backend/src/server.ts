@@ -1,91 +1,85 @@
-import express, { Application, NextFunction, Request, Response } from "express";
-import cors from "cors";
-import HttpError from "./helper/error_handler";
-import { errorMiddleware } from "./middlewares/error_middleware";
-import { authRouter } from "./routes/auth_routes";
-import helmet from "helmet";
-import morgan from "morgan";
-import passport from "passport";
-import { passportJwt } from "./middlewares/passport-jwt";
-import cookieParser from "cookie-parser";
-import { productRouter } from "./routes/products_routes";
-import { userRouter } from "./routes/user_router";
-import RedisProvider from "./providers/redis_client";
-import { orderRouter } from "./routes/order_routes";
-import PrismaClientProvider from "./providers/provide_prism_client";
-import { wishListRouter } from "./routes/wishlist_routes";
+import express, { Application, NextFunction, Request, Response } from "express"
+import cors from "cors"
+import HttpError from "./helper/error_handler"
+import { errorMiddleware } from "./middlewares/error_middleware"
+import { authRouter } from "./routes/auth_routes"
+import helmet from "helmet"
+import morgan from "morgan"
+import passport from "passport"
+import { passportJwt } from "./middlewares/passport-jwt"
+import cookieParser from "cookie-parser"
+import { productRouter } from "./routes/products_routes"
+import { userRouter } from "./routes/user_router"
+import RedisProvider from "./providers/redis_client"
+import { orderRouter } from "./routes/order_routes"
+import PrismaClientProvider from "./providers/provide_prism_client"
+import { wishListRouter } from "./routes/wishlist_routes"
 
-const app: Application = express();
+const main = async () => {
+  try {
+    const app: Application = express()
 
-const PORT = process.env.PORT || 9000;
+    const PORT = process.env.PORT || 9000
 
-PrismaClientProvider.get()
-  .$connect()
-  .then(() => {
-    console.log("Database connected!");
-  })
-  .catch((error) => console.log(error));
+    // redis connection
+    const client = RedisProvider.getInstance()
 
-// redis connection
-const client = RedisProvider.getInstance();
+    await Promise.all([PrismaClientProvider.get().$connect(), client.connect()])
 
-client
-  .connect()
-  .then(() => {
-    console.log("Redis connected");
-  })
-  .catch((error) => {
-    console.log(`Redis client error ${error}`);
-  });
+    console.log("Database connection established!")
+    console.log("Redis connection established!")
 
-client.on("error", (error) => {
-  console.log(`Redis client error ${error}`);
-});
+    // middlewares
 
-// middlewares
+    app.use(express.json())
 
-app.use(express.json());
+    app.use(cookieParser())
 
-app.use(cookieParser());
+    app.use(
+      cors({
+        origin: [
+          "http://localhost:3000",
+          "https://62c90fc4c26d322821b958b9--beamish-unicorn-685f33.netlify.app",
+        ],
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+      })
+    )
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "https://62c90fc4c26d322821b958b9--beamish-unicorn-685f33.netlify.app",
-    ],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+    app.use(helmet())
 
-app.use(helmet());
+    app.use(morgan("dev"))
 
-app.use(morgan("dev"));
+    passport.initialize()
 
-passport.initialize();
+    passportJwt(passport)
 
-passportJwt(passport);
+    // routes
+    app.use("/api/v1", authRouter)
+    app.use("/api/v1", productRouter)
+    app.use("/api/v1", userRouter)
+    app.use("/api/v1", orderRouter)
+    app.use("/api/v1", wishListRouter)
 
-// routes
-app.use("/api/v1", authRouter);
-app.use("/api/v1", productRouter);
-app.use("/api/v1", userRouter);
-app.use("/api/v1", orderRouter);
-app.use("/api/v1", wishListRouter);
+    // passport fail
+    app.get("/auth/fail", (req: Request, res: Response, next: NextFunction) => {
+      return next(HttpError.unauthorized("Unauthorized!"))
+    })
 
-// passport fail
-app.get("/auth/fail", (req: Request, res: Response, next: NextFunction) => {
-  return next(HttpError.unauthorized("Unauthorized!"));
-});
+    // error handler
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      return next(HttpError.notFound("No Route Match!"))
+    })
 
-// error handler
-app.use((req: Request, res: Response, next: NextFunction) => {
-  return next(HttpError.notFound("No Route Match!"));
-});
+    app.use(errorMiddleware)
 
-app.use(errorMiddleware);
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT} 🚀`)
+    })
+  } catch (e: any) {
+    console.log(e.message)
+    process.exit(1)
+  }
+}
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT} 🚀`);
-});
+main()
